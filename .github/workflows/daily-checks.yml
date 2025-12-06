@@ -1,0 +1,78 @@
+name: Daily Error Correction and Update Checks
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  error-check:
+    name: Error Checking
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ORA-Platform/package.json
+      
+      - name: Install dependencies
+        run: |
+          cd ORA-Platform
+          npm ci
+      
+      - name: Run build check
+        run: |
+          cd ORA-Platform
+          npm run build
+
+  dependency-check:
+    name: Dependency Update Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ORA-Platform/package.json
+      
+      - name: Check for outdated dependencies
+        run: |
+          cd ORA-Platform
+          echo "Checking for outdated dependencies..."
+          npm outdated || EXIT_CODE=$?
+          if [ "${EXIT_CODE:-0}" -eq 0 ]; then
+            echo "::notice::All dependencies are up to date"
+          elif [ "$EXIT_CODE" -eq 1 ]; then
+            echo "::warning::Some dependencies are outdated"
+          else
+            echo "::error::npm outdated command failed with exit code $EXIT_CODE"
+            exit $EXIT_CODE
+          fi
+      
+      - name: Security audit
+        run: |
+          cd ORA-Platform
+          echo "Running security audit..."
+          npm audit --audit-level=moderate || EXIT_CODE=$?
+          if [ "${EXIT_CODE:-0}" -eq 0 ]; then
+            echo "::notice::No security vulnerabilities found"
+          else
+            echo "::warning::Security audit found issues (exit code: $EXIT_CODE)"
+            # Don't fail the workflow for audit issues, just warn
+          fi
