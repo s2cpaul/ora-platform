@@ -279,12 +279,20 @@ jobs:
     - name: Check for secrets
       run: |
         echo "Scanning for accidentally committed secrets..."
-        if git log --all --full-history --source --grep="password\|secret\|key\|token" --regexp-ignore-case --oneline | head -20; then
-          echo "Warning: Found potential secrets in commit messages (showing first 20)"
+        SECRET_COMMITS=$(git log --all --full-history --source --grep="password\|secret\|key\|token" --regexp-ignore-case --oneline | head -20 || true)
+        if [ ! -z "$SECRET_COMMITS" ]; then
+          echo "Warning: Found potential secrets in commit messages:"
+          echo "$SECRET_COMMITS"
+        else
+          echo "No secrets found in commit messages"
         fi
         # Check for common secret patterns in files
-        if grep -r -i "password\s*=\|api_key\s*=\|secret\s*=" . --exclude-dir={.git,node_modules} | head -20 || true; then
-          echo "Warning: Found potential hardcoded secrets (showing first 20)"
+        SECRET_FILES=$(grep -r -i "password\s*=\|api_key\s*=\|secret\s*=" . --exclude-dir={.git,node_modules} | head -20 || true)
+        if [ ! -z "$SECRET_FILES" ]; then
+          echo "Warning: Found potential hardcoded secrets in files:"
+          echo "$SECRET_FILES"
+        else
+          echo "No hardcoded secrets found in files"
         fi
 
   # Deployment summary
