@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Global - Voice of the Customer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @custom-variant dark (&:is(.dark *));
+
+        :root {
+            --font-size: 16px;
+            --background: #ffffff;
+            --foreground: oklch(0.145 0 0);
+            --card: #ffffff;
+            --card-foreground: oklch(0.145 0 0);
+            --popover: oklch(1 0 0);
+            --popover-foreground: oklch(0.145 0 0);
+            --primary: #030213;
+            --primary-foreground: oklch(1 0 0);
+            --secondary: oklch(0.95 0.0058 264.53);
+            --secondary-foreground: #030213;
+            --muted: #ececf0;
+            --muted-foreground: #717182;
+            --accent: #e9ebef;
+            --accent-foreground: #030213;
+            --destructive: #d4183d;
+            --destructive-foreground: #ffffff;
+            --border: rgba(0, 0, 0, 0.1);
+            --input: transparent;
+            --input-background: #f3f3f5;
+            --switch-background: #cbced4;
+            --font-weight-medium: 500;
+            --font-weight-normal: 400;
+            --ring: oklch(0.708 0 0);
+            --chart-1: oklch(0.646 0.222 41.116);
+            --chart-2: oklch(0.6 0.118 184.704);
+            --chart-3: oklch(0.398 0.07 227.392);
+            --chart-4: oklch(0.828 0.189 84.429);
+            --chart-5: oklch(0.769 0.188 70.08);
+            --radius: 0.625rem;
+            --sidebar: oklch(0.985 0 0);
+            --sidebar-foreground: oklch(0.145 0 0);
+            --sidebar-primary: #030213;
+            --sidebar-primary-foreground: oklch(0.985 0 0);
+            --sidebar-accent: oklch(0.97 0 0);
+            --sidebar-accent-foreground: oklch(0.205 0 0);
+            --sidebar-border: oklch(0.922 0 0);
+            --sidebar-ring: oklch(0.708 0 0);
+        }
+
+        .dark {
+            --background: oklch(0.145 0 0);
+            --foreground: oklch(0.985 0 0);
+            --card: oklch(0.145 0 0);
+            --card-foreground: oklch(0.985 0 0);
+            --popover: oklch(0.145 0 0);
+            --popover-foreground: oklch(0.985 0 0);
+            --primary: oklch(0.985 0 0);
+            --primary-foreground: oklch(0.205 0 0);
+            --secondary: oklch(0.269 0 0);
+            --secondary-foreground: oklch(0.985 0 0);
+            --muted: oklch(0.269 0 0);
+            --muted-foreground: oklch(0.708 0 0);
+            --accent: oklch(0.269 0 0);
+            --accent-foreground: oklch(0.985 0 0);
+            --destructive: oklch(0.396 0.141 25.723);
+            --destructive-foreground: oklch(0.637 0.237 25.331);
+            --border: oklch(0.269 0 0);
+            --input: oklch(0.269 0 0);
+            --ring: oklch(0.439 0 0);
+            --font-weight-medium: 500;
+            --font-weight-normal: 400;
+            --chart-1: oklch(0.488 0.243 264.376);
+            --chart-2: oklch(0.696 0.17 162.48);
+            --chart-3: oklch(0.769 0.188 70.08);
+            --chart-4: oklch(0.627 0.265 303.9);
+            --chart-5: oklch(0.645 0.246 16.439);
+            --sidebar: oklch(0.205 0 0);
+            --sidebar-foreground: oklch(0.985 0 0);
+            --sidebar-primary: oklch(0.488 0.243 264.376);
+            --sidebar-primary-foreground: oklch(0.985 0 0);
+            --sidebar-accent: oklch(0.269 0 0);
+            --sidebar-accent-foreground: oklch(0.985 0 0);
+            --sidebar-border: oklch(0.269 0 0);
+            --sidebar-ring: oklch(0.439 0 0);
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-size: var(--font-size);
+        }
+
+        .bg-background { background-color: var(--background); }
+        .text-foreground { color: var(--foreground); }
+        .bg-primary { background-color: var(--primary); }
+        .text-primary { color: var(--primary); }
+        .text-primary-foreground { color: var(--primary-foreground); }
+        .bg-card { background-color: var(--card); }
+        .text-card-foreground { color: var(--card-foreground); }
+        .text-muted-foreground { color: var(--muted-foreground); }
+        .bg-muted { background-color: var(--muted); }
+        .border-border { border-color: var(--border); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: calc(var(--radius) - 2px);
+            font-weight: var(--font-weight-medium);
+            transition: all 0.2s;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border);
+            background-color: transparent;
+            color: var(--foreground);
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--muted);
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.125rem;
+        }
+
+        .card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, var(--foreground), var(--muted-foreground));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-primary {
+            background: linear-gradient(to right, var(--primary), var(--foreground));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-active {
+            background-color: rgba(34, 197, 94, 0.2);
+            color: rgb(34, 197, 94);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-beta {
+            background-color: rgba(234, 179, 8, 0.2);
+            color: rgb(234, 179, 8);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: currentColor;
+        }
+
+        .group:hover .group-hover-scale {
+            transform: scale(1.05);
+        }
+
+        .group:hover .group-hover-translate {
+            transform: translateX(0.25rem);
+        }
+
+        .transition-transform {
+            transition: transform 0.3s;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="border-b sticky top-0 z-50" style="border-color: var(--border); background-color: rgba(var(--background), 0.8); backdrop-filter: blur(8px);">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold gradient-text">GenAI Global</h1>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#" class="text-foreground hover:text-primary px-3 py-2 transition-colors">Home</a>
+                        <a href="#" class="text-muted-foreground hover:text-primary px-3 py-2 transition-colors">Community</a>
+                        <a href="#" class="text-muted-foreground hover:text-primary px-3 py-2 transition-colors">Resources</a>
+                        <a href="#" class="text-muted-foreground hover:text-primary px-3 py-2 transition-colors">Events</a>
+                        <a href="#" class="text-muted-foreground hover:text-primary px-3 py-2 transition-colors">About</a>
+                    </div>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="hidden md:block">
+                    <a href="#" class="btn btn-primary">Join Community</a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button class="btn btn-outline p-2">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="4" x2="20" y1="12" y2="12"/>
+                            <line x1="4" x2="20" y1="6" y2="6"/>
+                            <line x1="4" x2="20" y1="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="relative py-24 lg:py-32 overflow-hidden">
+            <!-- Background gradient -->
+            <div class="absolute inset-0" style="background: linear-gradient(to bottom right, var(--background), var(--background), rgba(var(--muted), 0.2));"></div>
+            
+            <div class="relative max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="text-center max-w-4xl mx-auto">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8" style="background-color: rgba(var(--muted), 0.5); border: 1px solid var(--border);">
+                        <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .962L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                            <path d="M20 3v4"/>
+                            <path d="M22 5h-4"/>
+                            <path d="M4 17v2"/>
+                            <path d="M5 18H3"/>
+                        </svg>
+                        <span class="text-sm text-muted-foreground">Empowering the Future of AI</span>
+                    </div>
+
+                    <!-- Headline -->
+                    <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8">
+                        <span class="gradient-text">Global Gen-AI</span>
+                        <br>
+                        <span class="gradient-primary">Community</span>
+                    </h1>
+
+                    <!-- Mission Statement -->
+                    <p class="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed">
+                        Connecting visionaries, researchers, and innovators worldwide to shape the future of artificial intelligence through collaboration, knowledge sharing, and ethical development.
+                    </p>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <a href="#apps" class="btn btn-primary btn-lg group">
+                            Explore Web Apps
+                            <svg class="ml-2 icon group-hover-translate transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                                <path d="m12 5 7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="btn btn-outline btn-lg">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Web Apps Showcase -->
+        <section id="apps" class="py-24" style="background-color: rgba(var(--muted), 0.3);">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <!-- Section Header -->
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+                        Persistent Web Applications
+                    </h2>
+                    <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
+                        Explore our suite of cutting-edge AI applications designed to accelerate innovation and enhance collaboration within the global AI community.
+                    </p>
+                </div>
+
+                <!-- Apps Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- App 1: AI Intelligence Hub -->
+                    <div class="card group">
+                        <!-- Image -->
+                        <div class="relative h-48 overflow-hidden">
+                            <img 
+                                src="https://images.unsplash.com/photo-1716436329836-208bea5a55e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwZGFzaGJvYXJkfGVufDF8fHx8MTc1OTc4ODkzNnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                                alt="AI Intelligence Hub"
+                                class="w-full h-full object-cover group-hover-scale transition-transform"
+                            />
+                            <div class="absolute top-4 right-4">
+                                <div class="px-3 py-1 rounded-full text-xs font-medium status-active">
+                                    Active
+                                </div>
+                            </div>
+                            <div class="absolute top-4 left-4 p-2 rounded-lg" style="background-color: rgba(var(--background), 0.8); backdrop-filter: blur(8px);">
+                                <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                    <line x1="12" x2="12" y1="19" y2="22"/>
+                                    <line x1="8" x2="16" y1="22" y2="22"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xl font-bold">AI Intelligence Hub</h3>
+                            </div>
+                            <p class="text-base text-muted-foreground mb-4">
+                                Advanced analytics and insights platform for AI model performance monitoring and optimization.
+                            </p>
+
+                            <!-- Features -->
+                            <div class="space-y-4">
+                                <div class="space-y-2">
+                                    <h4 class="font-medium text-sm text-muted-foreground">Key Features</h4>
+                                    <ul class="space-y-1">
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Real-time monitoring
+                                        </li>
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Performance analytics
+                                        </li>
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Model comparison
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- CTA Button -->
+                                <a href="#" class="btn btn-outline w-full group">
+                                    Launch Application
+                                    <svg class="ml-2 icon group-hover-translate transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M7 7h10v10"/>
+                                        <path d="M7 17 17 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- App 2: ML Analytics Studio -->
+                    <div class="card group">
+                        <!-- Image -->
+                        <div class="relative h-48 overflow-hidden">
+                            <img 
+                                src="https://images.unsplash.com/photo-1591453089816-0fbb971b454c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHxtYWNoaW5lJTIwbGVhcm5pbmclMjBhbmFseXRpY3N8ZW58MXx8fHwxNzU5ODg0MjYzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                                alt="ML Analytics Studio"
+                                class="w-full h-full object-cover group-hover-scale transition-transform"
+                            />
+                            <div class="absolute top-4 right-4">
+                                <div class="px-3 py-1 rounded-full text-xs font-medium status-active">
+                                    Active
+                                </div>
+                            </div>
+                            <div class="absolute top-4 left-4 p-2 rounded-lg" style="background-color: rgba(var(--background), 0.8); backdrop-filter: blur(8px);">
+                                <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"/>
+                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xl font-bold">ML Analytics Studio</h3>
+                            </div>
+                            <p class="text-base text-muted-foreground mb-4">
+                                Comprehensive machine learning analytics platform for data scientists and researchers.
+                            </p>
+
+                            <!-- Features -->
+                            <div class="space-y-4">
+                                <div class="space-y-2">
+                                    <h4 class="font-medium text-sm text-muted-foreground">Key Features</h4>
+                                    <ul class="space-y-1">
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Data visualization
+                                        </li>
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Statistical analysis
+                                        </li>
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Predictive modeling
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- CTA Button -->
+                                <a href="#" class="btn btn-outline w-full group">
+                                    Launch Application
+                                    <svg class="ml-2 icon group-hover-translate transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M7 7h10v10"/>
+                                        <path d="M7 17 17 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- App 3: AI Accelerator Platform -->
+                    <div class="card group">
+                        <!-- Image -->
+                        <div class="relative h-48 overflow-hidden">
+                            <img 
+                                src="https://images.unsplash.com/photo-1757310998648-f8aaa5572e8e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHxhaSUyMHRlY2hub2xvZ3klMjBpbnRlcmZhY2V8ZW58MXx8fHwxNzU5ODAyODM3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                                alt="AI Accelerator Platform"
+                                class="w-full h-full object-cover group-hover-scale transition-transform"
+                            />
+                            <div class="absolute top-4 right-4">
+                                <div class="px-3 py-1 rounded-full text-xs font-medium status-beta">
+                                    Beta
+                                </div>
+                            </div>
+                            <div class="absolute top-4 left-4 p-2 rounded-lg" style="background-color: rgba(var(--background), 0.8); backdrop-filter: blur(8px);">
+                                <svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xl font-bold">AI Accelerator Platform</h3>
+                            </div>
+                            <p class="text-base text-muted-foreground mb-4">
+                                Next-generation platform for rapid AI development and deployment across multiple environments.
+                            </p>
+
+                            <!-- Features -->
+                            <div class="space-y-4">
+                                <div class="space-y-2">
+                                    <h4 class="font-medium text-sm text-muted-foreground">Key Features</h4>
+                                    <ul class="space-y-1">
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Rapid deployment
+                                        </li>
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Multi-environment support
+                                        </li>
+                                        <li class="text-sm flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full" style="background-color: var(--primary);"></div>
+                                            Auto-scaling
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- CTA Button -->
+                                <button class="btn btn-outline w-full opacity-50 cursor-not-allowed" disabled>
+                                    Coming Soon
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom CTA -->
+                <div class="text-center mt-16">
+                    <p class="text-muted-foreground mb-6">
+                        Ready to contribute to the future of AI?
+                    </p>
+                    <a href="#" class="btn btn-primary btn-lg">Join Our Developer Community</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-background border-t" style="border-color: var(--border);">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold">GenAI Global</h3>
+                    <p class="text-muted-foreground text-sm">
+                        Empowering the future of artificial intelligence through global collaboration and innovation.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-muted-foreground hover:text-primary transition-colors">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+                                <path d="M9 18c-4.51 2-5-2-7-2"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-muted-foreground hover:text-primary transition-colors">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-muted-foreground hover:text-primary transition-colors">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                                <rect width="4" height="12" x="2" y="9"/>
+                                <circle cx="4" cy="4" r="2"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-muted-foreground hover:text-primary transition-colors">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Community -->
+                <div class="space-y-4">
+                    <h4 class="font-medium">Community</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Forums</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Discord</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Events</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Meetups</a></li>
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div class="space-y-4">
+                    <h4 class="font-medium">Resources</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Documentation</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Tutorials</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Research Papers</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Best Practices</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company -->
+                <div class="space-y-4">
+                    <h4 class="font-medium">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">About</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Careers</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Press</a></li>
+                        <li><a href="#" class="text-muted-foreground hover:text-primary transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center" style="border-color: var(--border);">
+                <p class="text-sm text-muted-foreground">
+                    © 2025 GenAI Global Community. All rights reserved.
+                </p>
+                <div class="mt-4 md:mt-0 flex space-x-6 text-sm">
+                    <a href="#" class="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-muted-foreground hover:text-primary transition-colors">Terms of Service</a>
+                    <a href="#" class="text-muted-foreground hover:text-primary transition-colors">Code of Conduct</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add hover effects for interactive elements
+        document.querySelectorAll('.group').forEach(element => {
+            element.addEventListener('mouseenter', function() {
+                const scaleElements = this.querySelectorAll('.group-hover-scale');
+                const translateElements = this.querySelectorAll('.group-hover-translate');
+                
+                scaleElements.forEach(el => el.classList.add('transform', 'scale-105'));
+                translateElements.forEach(el => el.classList.add('transform', 'translate-x-1'));
+            });
+
+            element.addEventListener('mouseleave', function() {
+                const scaleElements = this.querySelectorAll('.group-hover-scale');
+                const translateElements = this.querySelectorAll('.group-hover-translate');
+                
+                scaleElements.forEach(el => el.classList.remove('transform', 'scale-105'));
+                translateElements.forEach(el => el.classList.remove('transform', 'translate-x-1'));
+            });
+        });
+    </script>
+</body>
+</html>
