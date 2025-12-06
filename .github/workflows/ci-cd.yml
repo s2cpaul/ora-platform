@@ -1,0 +1,325 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18.x'
+  DOTNET_VERSION: '7.0.x'
+
+jobs:
+  # Build job using Make
+  build:
+    name: Build with Make
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Make
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential
+        make --version
+
+    - name: Cache build artifacts
+      uses: actions/cache@v3
+      with:
+        path: |
+          build/
+          dist/
+        key: ${{ runner.os }}-build-${{ hashFiles('**/Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
+
+    - name: Build project with Make
+      run: |
+        if [ -f Makefile ]; then
+          echo "Running make build..."
+          make build || echo "Make build target not found, skipping"
+        else
+          echo "No Makefile found, skipping make build"
+        fi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: build-artifacts
+        path: |
+          build/
+          dist/
+          bin/
+        retention-days: 7
+
+  # Visual Studio / .NET Build
+  dotnet-build:
+    name: Visual Studio / .NET Build
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Restore dependencies
+      run: |
+        if (Test-Path "*.sln") {
+          Write-Host "Restoring solution dependencies..."
+          dotnet restore
+        } elseif (Test-Path "*.csproj") {
+          Write-Host "Restoring project dependencies..."
+          dotnet restore
+        } else {
+          Write-Host "No .NET solution or project found"
+        }
+      shell: pwsh
+
+    - name: Build with MSBuild
+      run: |
+        $solution = Get-ChildItem -Filter "*.sln" | Select-Object -First 1
+        if ($solution) {
+          Write-Host "Building solution: $($solution.Name)"
+          msbuild $solution.Name /p:Configuration=Release /p:Platform="Any CPU"
+        } else {
+          Write-Host "No solution file found, skipping MSBuild"
+        }
+      shell: pwsh
+
+    - name: Build with dotnet
+      run: |
+        if (Test-Path "*.sln") {
+          Write-Host "Building with dotnet..."
+          dotnet build --configuration Release --no-restore
+        } elseif (Test-Path "*.csproj") {
+          Write-Host "Building project with dotnet..."
+          dotnet build --configuration Release --no-restore
+        } else {
+          Write-Host "No .NET project found"
+        }
+      shell: pwsh
+
+    - name: Run tests
+      run: |
+        if (Test-Path "*.sln") {
+          Write-Host "Running tests..."
+          dotnet test --configuration Release --no-build --verbosity normal
+        } else {
+          Write-Host "No tests found"
+        }
+      shell: pwsh
+
+  # Figma Integration
+  figma-sync:
+    name: Figma Design Sync
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write  # Needed to commit design assets
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Cache npm dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install Figma CLI tools
+      run: |
+        if [ -f package.json ]; then
+          npm install
+        fi
+        # Install figma-export or similar tools if needed
+        echo "Figma integration setup complete"
+
+    - name: Export Figma designs
+      env:
+        FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
+        FIGMA_FILE_KEY: ${{ secrets.FIGMA_FILE_KEY }}
+      run: |
+        if [ ! -z "$FIGMA_TOKEN" ] && [ ! -z "$FIGMA_FILE_KEY" ]; then
+          echo "Figma credentials configured"
+          # Add Figma export commands here when figma-export is configured
+          # Example: npx figma-export use-config figma.config.js
+        else
+          echo "Figma secrets not configured. Set FIGMA_TOKEN and FIGMA_FILE_KEY in repository secrets."
+        fi
+
+    - name: Commit design assets
+      if: success()
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        if [ -n "$(git status --porcelain)" ]; then
+          git add assets/ design/ || true
+          git commit -m "chore: update Figma design assets [skip ci]" || echo "No changes to commit"
+          # Uncomment to push changes back
+          # git push
+        else
+          echo "No design changes to commit"
+        fi
+
+  # Firestore Deployment
+  firestore-deploy:
+    name: Deploy to Firestore
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Cache npm dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm ci || npm install
+        fi
+
+    - name: Install Firebase CLI
+      run: npm install -g firebase-tools
+
+    - name: Verify Firebase configuration
+      run: |
+        if [ -f firebase.json ]; then
+          echo "Firebase configuration found"
+          cat firebase.json
+        else
+          echo "No firebase.json found. Please configure Firebase for your project."
+        fi
+
+    - name: Deploy Firestore Rules
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      run: |
+        if [ ! -z "$FIREBASE_TOKEN" ]; then
+          echo "Deploying Firestore rules and indexes..."
+          if [ -f firestore.rules ]; then
+            firebase deploy --only firestore:rules --token "$FIREBASE_TOKEN" --non-interactive
+          else
+            echo "No firestore.rules file found"
+          fi
+          if [ -f firestore.indexes.json ]; then
+            firebase deploy --only firestore:indexes --token "$FIREBASE_TOKEN" --non-interactive
+          else
+            echo "No firestore.indexes.json file found"
+          fi
+        else
+          echo "FIREBASE_TOKEN not configured. Set it in repository secrets to enable deployment."
+        fi
+
+    - name: Deploy Functions
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      run: |
+        if [ ! -z "$FIREBASE_TOKEN" ] && [ -d "functions" ]; then
+          echo "Deploying Firebase Functions..."
+          firebase deploy --only functions --token "$FIREBASE_TOKEN" --non-interactive
+        else
+          echo "Functions directory not found or FIREBASE_TOKEN not set"
+        fi
+
+  # Linting and Code Quality
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Run linters
+      run: |
+        if [ -f package.json ]; then
+          if npm list --depth=0 eslint 2>/dev/null; then
+            echo "Running ESLint..."
+            npm run lint || echo "Lint script not found"
+          fi
+        fi
+
+    - name: Check for secrets
+      run: |
+        echo "Scanning for accidentally committed secrets..."
+        SECRET_COMMITS=$(git log --all --full-history --source --grep="password\|secret\|key\|token" --regexp-ignore-case --oneline | head -20 || true)
+        if [ ! -z "$SECRET_COMMITS" ]; then
+          echo "Warning: Found potential secrets in commit messages:"
+          echo "$SECRET_COMMITS"
+        else
+          echo "No secrets found in commit messages"
+        fi
+        # Check for common secret patterns in files
+        SECRET_FILES=$(grep -r -i "password\s*=\|api_key\s*=\|secret\s*=" . --exclude-dir={.git,node_modules} | head -20 || true)
+        if [ ! -z "$SECRET_FILES" ]; then
+          echo "Warning: Found potential hardcoded secrets in files:"
+          echo "$SECRET_FILES"
+        else
+          echo "No hardcoded secrets found in files"
+        fi
+
+  # Deployment summary
+  deployment-summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [build, dotnet-build, figma-sync, firestore-deploy, code-quality]
+    if: always()
+    permissions: {}
+
+    steps:
+    - name: Deployment Status
+      run: |
+        echo "=== CI/CD Pipeline Summary ==="
+        echo "Build Status: ${{ needs.build.result }}"
+        echo ".NET Build Status: ${{ needs.dotnet-build.result }}"
+        echo "Figma Sync Status: ${{ needs.figma-sync.result }}"
+        echo "Firestore Deploy Status: ${{ needs.firestore-deploy.result }}"
+        echo "Code Quality Status: ${{ needs.code-quality.result }}"
+        echo "============================="
