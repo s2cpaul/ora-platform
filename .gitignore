@@ -75,8 +75,6 @@ yarn.lock
 .firebaserc
 firebase-debug.log
 firestore-debug.log
-firestore.rules
-firestore.indexes.json
 ui-debug.log
 database-debug.log
 
@@ -100,7 +98,6 @@ figma-tokens.json
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
-.DS_Store
 .AppleDouble
 .LSOverride
 
@@ -117,7 +114,6 @@ tmp/
 temp/
 
 # Logs and databases
-*.log
 *.sql
 *.sqlite
 *.sqlite3
@@ -143,6 +139,5 @@ build/
 MANIFEST
 
 # Backup files
-*~
 *.orig
 *.rej
