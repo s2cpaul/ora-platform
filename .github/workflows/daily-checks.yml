@@ -31,18 +31,6 @@ jobs:
         run: |
           cd ORA-Platform
           npm run build
-        continue-on-error: true
-        id: build-check
-      
-      - name: Report build status
-        if: always()
-        run: |
-          if [ "${{ steps.build-check.outcome }}" = "failure" ]; then
-            echo "::error::Build check failed"
-            exit 1
-          else
-            echo "::notice::Build check passed"
-          fi
 
   dependency-check:
     name: Dependency Update Check
@@ -62,11 +50,25 @@ jobs:
       - name: Check for outdated dependencies
         run: |
           cd ORA-Platform
-          npm outdated || true
-          echo "::notice::Dependency check completed"
+          echo "Checking for outdated dependencies..."
+          npm outdated || EXIT_CODE=$?
+          if [ "${EXIT_CODE:-0}" -eq 0 ]; then
+            echo "::notice::All dependencies are up to date"
+          elif [ "$EXIT_CODE" -eq 1 ]; then
+            echo "::warning::Some dependencies are outdated"
+          else
+            echo "::error::npm outdated command failed with exit code $EXIT_CODE"
+            exit $EXIT_CODE
+          fi
       
       - name: Security audit
         run: |
           cd ORA-Platform
-          npm audit --audit-level=moderate || true
-          echo "::notice::Security audit completed"
+          echo "Running security audit..."
+          npm audit --audit-level=moderate || EXIT_CODE=$?
+          if [ "${EXIT_CODE:-0}" -eq 0 ]; then
+            echo "::notice::No security vulnerabilities found"
+          else
+            echo "::warning::Security audit found issues (exit code: $EXIT_CODE)"
+            # Don't fail the workflow for audit issues, just warn
+          fi
