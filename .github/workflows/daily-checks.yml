@@ -10,6 +10,8 @@ jobs:
   error-check:
     name: Error Checking
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -35,6 +37,8 @@ jobs:
   dependency-check:
     name: Dependency Update Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
