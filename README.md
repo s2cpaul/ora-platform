@@ -87,3 +87,13 @@ chmod +x git-auto.sh
 ```
 
 This will stage, commit, rebase, and push your changes automatically, activating your GitHub Actions workflow on every push.
+
+## Firebase Project and Web App Naming
+
+Firebase uses a two-level structure:
+- **Project**: The main container for all Firebase services (e.g., `ora-platform`).
+- **Web App**: A registered frontend app within your project (e.g., `ora-web-app`).
+
+You only need one Firebase project for hosting and backend services. You can register multiple web apps inside that project for different frontends. Use the hosting and configuration from your main project (`ora-platform`).
+
+If you see both names in your Firebase Console, this is normal. Your web app (`ora-web-app`) is just the frontend registered in your main project (`ora-platform`).
