@@ -53,3 +53,37 @@ Run `npm run dev` to start the development server.
 - Local:   http://localhost:5173/
 - Network: use --host to expose
 - Press h + enter to show help
+
+## Automate Your Git Workflow
+
+To automate staging, committing, rebasing, and pushing changes, use the provided script:
+
+1. Save the following as `git-auto.sh` in your project root:
+
+```sh
+#!/bin/zsh
+
+# Stage all changes
+git add .
+
+# Use a default commit message
+git commit -m "Automated commit: update and resolve changes" || echo "No changes to commit."
+
+# Pull and rebase with remote main
+git pull --rebase origin main
+
+# Push to remote main
+git push origin main
+```
+
+2. Make the script executable:
+```sh
+chmod +x git-auto.sh
+```
+
+3. Run the script to automate your workflow:
+```sh
+./git-auto.sh
+```
+
+This will stage, commit, rebase, and push your changes automatically, activating your GitHub Actions workflow on every push.
