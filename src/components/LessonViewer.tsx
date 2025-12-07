@@ -1622,13 +1622,13 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched }: LessonView
                                             (m: any) => m.methodId === method.id
                                           );
                                           return (
-                                            // Place key on the outer element, not as a prop
-                                            <DraggableMethod
-                                              id={method.id}
-                                              text={method.text}
-                                              isMatched={isMatched}
-                                              key={method.id}
-                                            />
+                                            <div key={method.id}>
+                                              <DraggableMethod
+                                                id={method.id}
+                                                text={method.text}
+                                                isMatched={isMatched}
+                                              />
+                                            </div>
                                           );
                                         })}
                                       </div>
@@ -1640,7 +1640,6 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched }: LessonView
                                       <div className="space-y-2">
                                         {check.targets.map((target: any) => (
                                           <DropTarget
-                                            key={target.id}
                                             id={target.id}
                                             description={target.description}
                                             matchedMethodText={matchedMethods[target.id]?.methodText || null}
