@@ -191,6 +191,16 @@ export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
                             <span>Expand AI vocabulary for identifying costs and risks when applying AI.</span>
                           </li>
                         </ul>
+                        {/* Video Section */}
+                        <div className="mt-4">
+                          <video
+                            src={require("../assets/RACI-Risk-In.mp4")}
+                            controls
+                            style={{ width: "100%", borderRadius: "8px" }}
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
                       </div>
                     )}
                     
