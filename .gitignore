@@ -33,3 +33,4 @@ pnpm-debug.log*
 
 # Environment variables
 /utils/supabase/info.tsx
+node_modules
