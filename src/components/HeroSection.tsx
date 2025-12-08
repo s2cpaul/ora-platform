@@ -68,8 +68,7 @@ export function HeroSection() {
             
             {/* Explore statement */}
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-tight md:leading-snug pb-[6px] text-center px-2 md:px-4" style={{ transform: 'scale(0.897)' }}>
-              We’re supporting the modern workforce with fast, free, mobile micro‑learning that makes teams truly ready to apply AI!<br /><br />
-              AI literacy isn’t optional anymore — it’s the new baseline for career success. Our collaborative approach drives efficiency, and innovation, while sparking positive energy, building a sense of community and unexpected partnerships!
+              We’re supporting the modern workforce with fast, free, mobile micro‑learning that makes teams truly ready to apply AI!
             </p>
           </div>
         </div>

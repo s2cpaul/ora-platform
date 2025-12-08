@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Navigation } from "./components/Navigation";
 import { HeroSection } from "./components/HeroSection";
 import { WebAppsShowcase } from "./components/WebAppsShowcase";
@@ -42,24 +42,42 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<"home" | "lessons" | "purchase" | "express-checkout" | "projections" | "90day" | "social" | "veterans" | "b2b" | "progress" | "notebook" | "sentiment" | "library" | "about" | "donate" | "impact" | "5year" | "ml-analytics">("home");
   const [isAgentOpen, setIsAgentOpen] = useState(false);
   const [isSentimentCheckInOpen, setIsSentimentCheckInOpen] = useState(false);
+  const [autoPlayAgentVideo, setAutoPlayAgentVideo] = useState(false);
+  const [lastVideoEndedAt, setLastVideoEndedAt] = useState<number | null>(null);
+  const sentimentTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Check for sentiment check-in after 6 minutes on the same page
+  // Global handler for when any video finishes
+  const handleAnyVideoEnded = () => {
+    setLastVideoEndedAt(Date.now());
+  };
+
+  // Sentiment check-in logic with 10s delay after video ends
   useEffect(() => {
+    // Clear any previous timer
+    if (sentimentTimerRef.current) {
+      clearTimeout(sentimentTimerRef.current);
+    }
     const lastCheckIn = localStorage.getItem('lastSentimentCheckIn');
     const now = new Date().getTime();
     const oneHourInMs = 60 * 60 * 1000; // 60 minutes
     
     // Show sentiment check-in if never shown or if it's been more than 60 minutes
     if (!lastCheckIn || now - parseInt(lastCheckIn) > oneHourInMs) {
-      // Wait 6 minutes (360,000 ms) before showing the modal
+      // Wait 6 minutes (360,000 ms) before showing the modal, but also check video timing
       const timer = setTimeout(() => {
-        setIsSentimentCheckInOpen(true);
+        // If a video ended less than 10s ago, delay further
+        const sinceVideo = lastVideoEndedAt ? Date.now() - lastVideoEndedAt : null;
+        if (sinceVideo !== null && sinceVideo < 10000) {
+          // Wait the remaining time
+          sentimentTimerRef.current = setTimeout(() => setIsSentimentCheckInOpen(true), 10000 - sinceVideo);
+        } else {
+          setIsSentimentCheckInOpen(true);
+        }
       }, 6 * 60 * 1000); // 6 minutes
-      
-      // Clear timer if page changes or component unmounts
+      sentimentTimerRef.current = timer;
       return () => clearTimeout(timer);
     }
-  }, [currentPage]); // Re-run when page changes to reset the 6-minute timer
+  }, [currentPage, lastVideoEndedAt]); // Re-run when page changes to reset the 6-minute timer
 
   useEffect(() => {
     // Apply theme class to document element
@@ -89,6 +107,21 @@ export default function App() {
   // useEffect(() => {
   //   initEngagementTracking();
   // }, []);
+
+  // Auto-open agent and play video for new users after 7 seconds on home
+  useEffect(() => {
+    if (currentPage === "home") {
+      const hasVisited = localStorage.getItem("ora_first_visit_done");
+      if (!hasVisited) {
+        const timer = setTimeout(() => {
+          setIsAgentOpen(true);
+          setAutoPlayAgentVideo(true);
+          localStorage.setItem("ora_first_visit_done", "true");
+        }, 7000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentPage]); 
 
   const toggleTheme = () => {
     setTheme(prev => prev === "light" ? "dark" : "light");
@@ -222,8 +255,6 @@ export default function App() {
         onNavigateToSentiment={navigateToSentiment}
         onNavigateToLibrary={navigateToLibrary}
         onNavigateToAbout={navigateToAbout}
-        onNavigateToDonate={navigateToDonate}
-        currentPage={currentPage}
       />
       
       {currentPage === "home" && (
@@ -238,7 +269,7 @@ export default function App() {
         <main>
           <LessonContent 
             onBack={navigateToHome} 
-            onVideoWatched={() => setIsSentimentCheckInOpen(true)}
+            onVideoWatched={handleAnyVideoEnded}
           />
         </main>
       )}
@@ -351,7 +382,7 @@ export default function App() {
       />
       
       {/* AI Agent */}
-      {isAgentOpen && <AIAgent onClose={() => setIsAgentOpen(false)} />}
+      {isAgentOpen && <AIAgent onClose={() => setIsAgentOpen(false)} autoPlayVideo={autoPlayAgentVideo} onVideoPlayed={() => setAutoPlayAgentVideo(false)} onVideoEnded={handleAnyVideoEnded} />}
       
       {/* Sentiment Check-In */}
       <SentimentCheckIn 

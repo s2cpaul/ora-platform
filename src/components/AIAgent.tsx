@@ -1,10 +1,13 @@
 import { X, Send, Bot, Bell, Mic, MicOff } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface AIAgentProps {
   onClose: () => void;
+  autoPlayVideo?: boolean;
+  onVideoPlayed?: () => void;
+  onVideoEnded?: () => void;
 }
 
 interface Message {
@@ -14,7 +17,7 @@ interface Message {
   timestamp: Date;
 }
 
-export function AIAgent({ onClose }: AIAgentProps) {
+export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideoEnded }: AIAgentProps) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -28,6 +31,8 @@ export function AIAgent({ onClose }: AIAgentProps) {
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const videoIframeRef = useRef<HTMLIFrameElement>(null);
+  const [hasAutoPlayed, setHasAutoPlayed] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,6 +76,28 @@ export function AIAgent({ onClose }: AIAgentProps) {
       }
     };
   }, []);
+
+  // Autoplay video if requested
+  useEffect(() => {
+    if (autoPlayVideo && !hasAutoPlayed && videoIframeRef.current) {
+      // Try to send play command to iframe (if supported)
+      videoIframeRef.current.contentWindow?.postMessage({ event: 'play' }, '*');
+      setHasAutoPlayed(true);
+      if (onVideoPlayed) onVideoPlayed();
+    }
+  }, [autoPlayVideo, hasAutoPlayed, onVideoPlayed]);
+
+  // Listen for HeyGen video end event (postMessage)
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      // HeyGen sends { event: 'ended' } when video finishes
+      if (event.data && event.data.event === 'ended') {
+        if (onVideoEnded) onVideoEnded();
+      }
+    }
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [onVideoEnded]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,8 +174,9 @@ export function AIAgent({ onClose }: AIAgentProps) {
           <div className="relative w-full bg-black flex items-center justify-center">
             {/* HeyGen Interactive Avatar */}
             <iframe
+              ref={videoIframeRef}
               src="https://app.heygen.com/embeds/7a4e401ed77d4dac94ba7d1d281c913e"
-              allow="camera; microphone; clipboard-write; display-capture"
+              allow="camera; microphone; clipboard-write; display-capture; autoplay"
               allowFullScreen
               className="w-full h-[400px] min-h-[300px] sm:h-[400px]"
               style={{ border: 'none', display: 'block' }}

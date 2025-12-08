@@ -102,10 +102,7 @@ export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
           </h1>
           <p className="text-xl text-muted-foreground flex items-center gap-2">
             <Brain className="h-5 w-5" />
-            We’re supporting the modern workforce with fast, free, mobile micro‑learning that makes teams truly ready to apply AI!
-          </p>
-          <p className="text-base text-muted-foreground mt-2">
-            AI literacy isn’t optional anymore — it’s the new baseline for career success. Our approach drives innovation, efficiency, and measurable organizational change, while sparking community, unexpected collaboration, positive energy, and partnerships that accelerate transformation.
+            Complete module 1 and submit feedback to unlock next lesson and more valuable content.
           </p>
         </div>
       </div>

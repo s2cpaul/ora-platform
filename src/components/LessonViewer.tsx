@@ -7,17 +7,18 @@ import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { ArrowLeft, Play, Target, Volume2, BookOpen, CheckCircle, Lock, Video, FileText } from 'lucide-react';
 import placeholderImage from '../assets/Applied-Placeholder1.png';
-import notebookLMImage from '../assets/notebookLM.png';
 import { awardLessonCompletion, isLessonCompleted } from '../utils/progressSystem';
 import type { Badge } from '../utils/progressSystem';
 import { trackQuizAnswer, trackContentInteraction, ContentViewTracker, getUserId } from '../utils/mlTracking';
 import { Confetti } from './Confetti';
 import { BadgeNotification } from "./BadgeNotification";
+import notebookLMImage from '../assets/Notebook.png';
 
 interface LessonViewerProps {
   lessonTitle: string;
   onBack: () => void;
   onVideoWatched?: () => void;
+  isAgent?: boolean;
 }
 
 // Drag and drop types
@@ -120,7 +121,7 @@ const lessonSections = [
   {
     id: 1,
     title: "Applied AI Governance & Organizational Blind Spots",
-    subtitle: "tutorial",
+    subtitle: "Micro-learning",
     duration: "15 min or less",
     videoUrl: "/RACI-Risk-In.mp4", // replaced HeyGen link with local video
     knowledgeChecks: [
@@ -558,7 +559,7 @@ const lessonSections = [
   }
 ];
 
-function LessonViewerContent({ lessonTitle, onBack, onVideoWatched }: LessonViewerProps) {
+function LessonViewerContent({ lessonTitle, onBack, onVideoWatched, isAgent = false }: LessonViewerProps) {
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: number | number[] }>({});
   const [videoPlaying, setVideoPlaying] = useState<{ [key: number]: boolean }>({});
   const [matchedMethods, setMatchedMethods] = useState<{ [key: string]: { methodId: string; methodText: string } }>({});
@@ -933,11 +934,270 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched }: LessonView
     return userAnswerLower.includes('mini');
   };
 
+  // Handler for HTML5 video end
+  const handleVideoEnded = () => {
+    if (onVideoWatched) onVideoWatched();
+  };
+
+  // Handler for YouTube iframe end (using postMessage API)
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      // YouTube sends { event: 'onStateChange', data: 0 } when video ends
+      if (event.origin.includes('youtube.com') && event.data && event.data.event === 'onStateChange' && event.data.data === 0) {
+        if (onVideoWatched) onVideoWatched();
+      }
+    }
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [onVideoWatched]);
+
   return (
     <div>
       {displaySections.map((section, sectionIndex) => (
-        <div key={sectionIndex}>
-          {/* Section content goes here */}
+        <div key={sectionIndex} className="max-w-3xl mx-auto mt-8 mb-16">
+          {/* Header */}
+          <div className="flex items-center gap-4 mb-6">
+            <Button variant="ghost" onClick={onBack} className="h-8 px-3 text-sm">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to All Lessons
+            </Button>
+            <span className="text-xs text-muted-foreground ml-auto">{section.duration}</span>
+          </div>
+          <h1 className="text-3xl font-bold mb-2">{section.title}</h1>
+          {section.subtitle && (
+            <div className="text-sm text-muted-foreground mb-4 capitalize">{section.subtitle}</div>
+          )}
+
+          {/* Learning Objectives for section 1 */}
+          {section.id === 1 && (
+            <div className="mb-8">
+              <h2 className="text-lg font-semibold mb-2">Learning Objectives</h2>
+              <ul className="list-disc pl-6 text-sm text-muted-foreground space-y-1">
+                <li>Define AI literacy in simple terms.</li>
+                <li>Identify 2 ways AI capabilities can effect research, learning or career success.</li>
+                <li>Expand AI vocabulary for identifying costs and risks when applying AI.</li>
+              </ul>
+            </div>
+          )}
+
+          {/* Real World Activity for section 1 */}
+          {section.id === 1 && (
+            <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* What is AI? Video Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center">
+                <h3 className="font-semibold mb-1">What is AI? - For People in a Hurry.</h3>
+                <p className="text-xs text-muted-foreground mb-2 text-center">Learn how the RACI Matrix clarifies roles and responsibilities in real-world projects.</p>
+                <iframe
+                  width="100%"
+                  height="215"
+                  src={`https://www.youtube.com/embed/2ePf9rue1Ao?enablejsapi=1${isAgent ? '&autoplay=1' : ''}`}
+                  title="What is AI? - For People in a Hurry."
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-lg mb-2"
+                  onLoad={() => markActivityInteraction('youtube-watched')}
+                ></iframe>
+              </div>
+              {/* AI Literacy Card (inline, half width) */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center">
+                <h3 className="font-semibold mb-1">What is AI Literacy?</h3>
+                <p className="text-xs text-muted-foreground mb-2 text-center">
+                  <b>Definition:</b> The ability to understand, use, and evaluate AI tools responsibly.
+                </p>
+                <p className="text-xs text-muted-foreground mb-2 text-center">
+                  <b>Analogy:</b> Just like computer literacy became essential in the 1990s, AI literacy is today's baseline skill.
+                </p>
+                {/* Callout 1 */}
+                <div className="text-xs italic bg-gray-100 text-purple-700 mb-2 text-left border-l-4 border-purple-600 pl-2 px-1 dark:bg-gray-200 dark:text-black">
+                  "Career success increasingly depends on the ability to collaborate with AI systems, not just traditional skills"<br/>
+                  <span className="text-[10px]">- Forbes</span>
+                </div>
+                {/* Callout 2 */}
+                <div className="text-xs italic bg-gray-100 text-purple-700 mb-2 text-left border-l-4 border-purple-600 pl-2 px-1 dark:bg-gray-200 dark:text-black">
+                  "WEF predicts 170 million new roles will be created by AI over the next decade, making AI literacy essential for workforce readiness"<br/>
+                  <span className="text-[10px]">- World Economic Forum (WEF) Findings</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2 text-center">
+                  <b>AI Bias:</b> Algorithms may weigh certain features (like word choice, school, or zip code) that highly correlate with race, gender, or socioeconomic status.
+                </p>
+              </div>
+              {/* Micro-Mini Lesson about OpenAI Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center">
+                <h3 className="font-semibold mb-1">Micro-Lesson: Understanding OpenAI Costs</h3>
+                <ul className="text-xs text-muted-foreground mb-2 text-left list-disc pl-4 w-full max-w-xs">
+                  <li><b>AI breaks down text or speech into structured data.</b></li>
+                  <li><b>Vertexes & Numbers:</b> Think of it like mapping words into points in a giant network, each linked by numerical weights.</li>
+                  <li><b>Tokens:</b> Words, phrases, or chunks of text are converted into tokens (the basic units AI processes).</li>
+                  <li><b>Cost:</b> Every token processed has a cost. More tokens = higher expense.</li>
+                  <li><b>Free Trial Credits:</b> OpenAI's API offers free credits (e.g., $5 worth) for a trial period. These let you experiment without paying.</li>
+                  <li><b>Copilot Chat (Microsoft context):</b> If you're using Copilot inside Microsoft 365 (like Word, Excel, SharePoint), you don't see tokens directly — licensing covers usage.</li>
+                  <li><b>Limits:</b> Once you use up the free credits, you must pay per token. There is a "Pay-As-You-Go" structure. There's no unlimited free usage.</li>
+                </ul>
+                <a href="https://openai.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs mb-1">Visit OpenAI - ask questions to build AI vocabulary!</a>
+              </div>
+              {/* PixSpy YouTube Lesson Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center">
+                <h3 className="font-semibold mb-1">PixSpy.com: AI Image Analysis Demo</h3>
+                <p className="text-xs text-muted-foreground mb-2 text-center">
+                  <b>Watch PixSpy.com</b><br />
+                  Watch a few minutes of the video and explore <a href="https://pixspy.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline">PixSpy.com</a>.<br />
+                  Upload an image of your choice or a screen shot. This learning experience is yours to shape—what you discover and create with these tools is limited only by your imagination!
+                </p>
+                <iframe
+                  width="100%"
+                  height="215"
+                  src="https://www.youtube.com/embed/P5mVYUuYtHE?si=G3wB1damBgdERnx2"
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  className="rounded-lg mb-2 w-full aspect-video max-w-full"
+                  onLoad={() => markActivityInteraction('pixspy-clicked')}
+                ></iframe>
+              </div>
+              {/* NotebookLM Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center mt-4">
+                <h3 className="font-semibold mb-1">NotebookLM: AI-Powered Research</h3>
+                <a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer" className="w-full">
+                  <img src="/NotebookLM.png" alt="NotebookLM" className="w-full h-32 object-contain mb-2" />
+                </a>
+                <span className="text-xs text-muted-foreground mb-1 w-full text-left">"LM" stands for Language Model.</span>
+                <p className="text-xs text-muted-foreground mb-2 text-left w-full">
+                  NotebookLM is Google's AI‑powered research and note‑taking tool. It serves as a thinking partner to support research and learning. Start your own notebook today—for Applied AI. Copy this text paragraph and click to Try NotebookLM. Paste the text and generate a mindmpat or presentation.
+                </p>
+                <a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs mb-1 w-full text-left">Try NotebookLM</a>
+              </div>
+              {/* Frameworks Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start mt-4">
+                <h3 className="font-semibold mb-1">Frameworks</h3>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Frameworks provide proven guardrails for success. The OpenAI framework provides powerful capabilities for shared use and experimentation, there are several open source tools available including Pixspy.com and NotebookLM. These tools are designed for collaborative exploration, innovation and hands-on learning, allowing you to experiment with AI concepts in practical scenarios.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Knowledge Checks */}
+          <div className="mb-10">
+            <h2 className="text-lg font-semibold mb-4">Knowledge Checks</h2>
+            {section.knowledgeChecks && section.knowledgeChecks.map((check, checkIndex) => {
+              const key = `${section.id}-${checkIndex}`;
+              // Render different question types
+              if (check.type === 'textInput') {
+                return (
+                  <div key={key} className="mb-6 p-4 border rounded-lg bg-muted/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium">{check.question}</span>
+                      {check.questionLink && (
+                        <a href={check.questionLink} target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs ml-2">Reference</a>
+                      )}
+                    </div>
+                    {check.questionSubtext && <div className="text-xs text-muted-foreground mb-2">{check.questionSubtext}</div>}
+                    <input
+                      type="text"
+                      className="border rounded px-2 py-1 w-full text-sm mb-2"
+                      value={textInputAnswers[key] || ''}
+                      onChange={e => handleTextInputAnswer(section.id, checkIndex, e.target.value)}
+                      disabled={submittedQuizzes[key]}
+                    />
+                    {submittedQuizzes[key] && (
+                      <div className={`text-xs mt-1 ${isTextInputAnswerCorrect(section.id, checkIndex, check.acceptableAnswers) ? 'text-green-600' : 'text-red-500'}`}>{isTextInputAnswerCorrect(section.id, checkIndex, check.acceptableAnswers) ? 'Correct!' : 'Incorrect.'}</div>
+                    )}
+                    <Button size="sm" className="mt-2" onClick={() => handleSubmitQuiz(section.id, checkIndex)} disabled={submittedQuizzes[key]}>Submit</Button>
+                    {submittedQuizzes[key] && (
+                      <div className="text-xs text-muted-foreground mt-2">{check.explanation}</div>
+                    )}
+                  </div>
+                );
+              }
+              if (check.type === 'dragDrop') {
+                // Drag and drop question
+                return (
+                  <div key={key} className="mb-6 p-4 border rounded-lg bg-muted/10">
+                    <div className="font-medium mb-2">{check.question}</div>
+                    {check.questionSubtext && <div className="text-xs text-muted-foreground mb-2">{check.questionSubtext}</div>}
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex-1 flex flex-col gap-2">
+                        {check.targets && check.targets.map((target, idx) => (
+                          <DropTarget
+                            id={target.id}
+                            description={target.description}
+                            matchedMethodText={matchedMethods[target.id]?.methodText || null}
+                            matchedMethodId={matchedMethods[target.id]?.methodId || null}
+                            correctMethodId={target.correctMethodId}
+                            onDrop={handleMethodDrop}
+                            showResults={!!showDragDropResults[key]}
+                          />
+                        ))}
+                      </div>
+                      <div className="flex-1 flex flex-col gap-2">
+                        {check.methods && check.methods.map((method, idx) => {
+                          // Check if this method is already matched
+                          const isMatched = Object.values(matchedMethods).some((m: any) => m.methodId === method.id);
+                          return (
+                            <DraggableMethod id={method.id} text={method.text} isMatched={isMatched} />
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <Button size="sm" variant="outline" onClick={() => resetDragDropQuestion(section.id, checkIndex)}>Reset</Button>
+                      <Button size="sm" onClick={() => checkDragDropAnswers(section.id, checkIndex)} disabled={showDragDropResults[key]}>Check Answers</Button>
+                    </div>
+                    {showDragDropResults[key] && (
+                      <div className="text-xs text-muted-foreground mt-2">{check.explanation}</div>
+                    )}
+                  </div>
+                );
+              }
+              // Default: single or multi-select
+              return (
+                <div key={key} className="mb-6 p-4 border rounded-lg bg-muted/10">
+                  <div className="font-medium mb-2">{check.question}</div>
+                  {check.questionSubtext && <div className="text-xs text-muted-foreground mb-2">{check.questionSubtext}</div>}
+                  <div className="flex flex-col gap-2">
+                    {check.options && check.options.map((option, optionIdx) => {
+                      const isMultiSelect = Array.isArray(check.correctAnswer) || check.type === 'multiSelect';
+                      const checked = isMultiSelect
+                        ? (selectedAnswers[key] as number[] | undefined)?.includes(optionIdx)
+                        : selectedAnswers[key] === optionIdx;
+                      return (
+                        <label key={optionIdx} className="flex items-center gap-2 text-sm">
+                          <input
+                            type={isMultiSelect ? 'checkbox' : 'radio'}
+                            name={key}
+                            checked={!!checked}
+                            onChange={() => handleAnswerSelect(section.id, checkIndex, optionIdx, isMultiSelect)}
+                            disabled={submittedQuizzes[key]}
+                          />
+                          <span>{option}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {submittedQuizzes[key] && (
+                    <div className={`text-xs mt-1 ${isAnswerCorrect(section.id, checkIndex, check.correctAnswer) ? 'text-green-600' : 'text-red-500'}`}>{isAnswerCorrect(section.id, checkIndex, check.correctAnswer) ? 'Correct!' : 'Incorrect.'}</div>
+                  )}
+                  {submittedQuizzes[key] && (
+                    <div className="text-xs text-muted-foreground mt-2">{check.explanation}</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Resources */}
+          <div className="mb-10">
+            <h2 className="text-lg font-semibold mb-2">Resources</h2>
+            <ul className="list-disc pl-6 text-sm text-muted-foreground space-y-1">
+              {(section as any).resources && (section as any).resources.map((res: any, idx: number) => (
+                <li key={idx}>
+                  <a href={res.url} target="_blank" rel="noopener noreferrer" className="text-primary underline">{res.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Divider Line */}
           {sectionIndex < displaySections.length - 1 && (
