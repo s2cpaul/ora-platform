@@ -102,7 +102,10 @@ export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
           </h1>
           <p className="text-xl text-muted-foreground flex items-center gap-2">
             <Brain className="h-5 w-5" />
-            Complete module 1 and submit feedback to unlock next lesson and more valuable content.
+            We’re supporting the modern workforce with fast, free, mobile micro‑learning that makes teams truly ready to apply AI!
+          </p>
+          <p className="text-base text-muted-foreground mt-2">
+            AI literacy isn’t optional anymore — it’s the new baseline for career success. Our approach drives innovation, efficiency, and measurable organizational change, while sparking community, unexpected collaboration, positive energy, and partnerships that accelerate transformation.
           </p>
         </div>
       </div>
@@ -191,16 +194,6 @@ export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
                             <span>Expand AI vocabulary for identifying costs and risks when applying AI.</span>
                           </li>
                         </ul>
-                        {/* Video Section */}
-                        <div className="mt-4">
-                          <video
-                            src={require("../assets/RACI-Risk-In.mp4")}
-                            controls
-                            style={{ width: "100%", borderRadius: "8px" }}
-                          >
-                            Your browser does not support the video tag.
-                          </video>
-                        </div>
                       </div>
                     )}
                     

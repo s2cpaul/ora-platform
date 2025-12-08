@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "flutter-ai-playground-b51a5"
-  }
+    "default": "flutter-ai-playground-b51a5",
+    "production": "ora-platform-2681b"
+  },
+  "targets": {},
+  "etags": {}
 }

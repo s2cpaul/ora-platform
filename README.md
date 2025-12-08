@@ -97,3 +97,13 @@ Firebase uses a two-level structure:
 You only need one Firebase project for hosting and backend services. You can register multiple web apps inside that project for different frontends. Use the hosting and configuration from your main project (`ora-platform`).
 
 If you see both names in your Firebase Console, this is normal. Your web app (`ora-web-app`) is just the frontend registered in your main project (`ora-platform`).
+
+## Firebase Billing Setup
+
+To use Firebase App Hosting and other advanced features, you must enable billing on your project:
+
+- **Billing Plan**: Blaze (pay-as-you-go)
+- **Billing Account Name**: Firebase Payment
+- **Billing Account ID**: 0175A6-C0E8AE-A96919
+
+You can manage billing in the Firebase Console under Usage & Billing. Enabling billing unlocks App Hosting and other production features.
