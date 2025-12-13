@@ -20,10 +20,11 @@ interface NavigationProps {
   onNavigateToLibrary?: () => void;
   onNavigateToAbout?: () => void;
   onNavigateToDonate?: () => void;
+  onNavigateToPageCopy1?: () => void;
   currentPage: string;
 }
 
-export function Navigation({ theme, toggleTheme, onAgentToggle, onNavigateToPurchase, onNavigateToHome, onNavigateToProjections, onNavigateTo90Day, onNavigateToSocial, onNavigateToVeterans, onNavigateToB2B, onNavigateToProgress, onNavigateToNotebook, onNavigateToSentiment, onNavigateToLibrary, onNavigateToAbout, onNavigateToDonate, currentPage }: NavigationProps) {
+export function Navigation({ theme, toggleTheme, onAgentToggle, onNavigateToPurchase, onNavigateToHome, onNavigateToProjections, onNavigateTo90Day, onNavigateToSocial, onNavigateToVeterans, onNavigateToB2B, onNavigateToProgress, onNavigateToNotebook, onNavigateToSentiment, onNavigateToLibrary, onNavigateToAbout, onNavigateToDonate, onNavigateToPageCopy1, currentPage }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -125,6 +126,17 @@ export function Navigation({ theme, toggleTheme, onAgentToggle, onNavigateToPurc
                 >
                   <Heart className="h-4 w-4" fill={currentPage === "donate" ? "currentColor" : "none"} />
                   Donate
+                </button>
+              )}
+              {onNavigateToPageCopy1 && (
+                <button 
+                  onClick={onNavigateToPageCopy1}
+                  className={`hover:text-primary px-3 py-2 transition-colors flex items-center gap-2 ${
+                    currentPage === "pagecopy1" ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  PageCopy1
                 </button>
               )}
               {/* Hidden in desktop: Projections, B2B, Veterans */}
@@ -326,6 +338,20 @@ export function Navigation({ theme, toggleTheme, onAgentToggle, onNavigateToPurc
                 >
                   <AmericanFlag className="h-4 w-4" />
                   About
+                </button>
+              )}
+              {onNavigateToPageCopy1 && (
+                <button 
+                  onClick={() => {
+                    onNavigateToPageCopy1();
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`hover:text-primary px-3 py-2 transition-colors text-left flex items-center gap-2 ${
+                    currentPage === "pagecopy1" ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  PageCopy1
                 </button>
               )}
               <a 

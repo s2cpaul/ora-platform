@@ -10,6 +10,7 @@ import placeholderImage from '../assets/Applied-Placeholder1.png';
 import { awardLessonCompletion, isLessonCompleted } from '../utils/progressSystem';
 import type { Badge } from '../utils/progressSystem';
 import { trackQuizAnswer, trackContentInteraction, ContentViewTracker, getUserId } from '../utils/mlTracking';
+import { formatMultiSelectAnswer, formatCorrectAnswer } from '../utils/syntaxErrorPrevention';
 import { Confetti } from './Confetti';
 import { BadgeNotification } from "./BadgeNotification";
 import notebookLMImage from '../assets/Notebook.png';
@@ -121,7 +122,7 @@ const lessonSections = [
   {
     id: 1,
     title: "Applied AI Governance & Organizational Blind Spots",
-    subtitle: "Micro-learning",
+    subtitle: "3 x 15 min lessons  |  Knowledge Check • Untimed: self paced",
     duration: "15 min or less",
     videoUrl: "/RACI-Risk-In.mp4", // replaced HeyGen link with local video
     knowledgeChecks: [
@@ -165,23 +166,6 @@ const lessonSections = [
         ],
         correctAnswer: 1,
         explanation: "A RACI Matrix (Responsible, Accountable, Consulted, Informed) is a project management tool that clearly defines roles and responsibilities to ensure proper oversight in AI initiatives. It identifies who is Responsible for execution, who is Accountable for decisions, who should be Consulted for input, and who needs to be Informed of outcomes. This clarity is essential for effective AI governance, preventing gaps in accountability and ensuring all stakeholders understand their role in the AI lifecycle."
-      },
-      {
-        question: "Spot the Blind Spots",
-        questionSubtext: "Drag the correct answer to match each possible blind spot below.",
-        type: "dragDrop",
-        methods: [
-          { id: "vendorDependency", text: "Vendor Dependency" },
-          { id: "biasAwareness", text: "Bias Awareness" },
-          { id: "oversightCapacity", text: "Oversight Capacity" },
-          { id: "technicalLiteracy", text: "Technical Literacy" }
-        ],
-        targets: [
-          { id: "t1", description: "Single reviewer", correctMethodId: "oversightCapacity" },
-          { id: "t2", description: "Lack of skills and AI literacy to evaluate outputs", correctMethodId: "technicalLiteracy" },
-          { id: "t3", description: "Failure to audit and test for diverse groups", correctMethodId: "biasAwareness" },
-          { id: "t4", description: "Lock‑in and reduced adaptability", correctMethodId: "vendorDependency" }
-        ]
       },
       {
         question: "Air‑gapping can be practiced for isolating networks with additional security and compliance needs because it… (Select all that apply)",
@@ -233,6 +217,102 @@ const lessonSections = [
   },
   {
     id: 2,
+    title: "Applied AI Governance & Organizational Blind Spots",
+    subtitle: "3 x 15 min lessons  |  Knowledge Check • Untimed: self paced",
+    duration: "15 min or less",
+    videoUrl: "/RACI-Risk-In.mp4", // replaced HeyGen link with local video
+    knowledgeChecks: [
+      {
+        question: "Cost Considerations: Identify the faster, cheaper version of GPT-5 designed for well-defined tasks with the lowest token cost.",
+        questionLink: "https://openai.com/api/pricing/",
+        questionSubtext: "Enter the model name (hint: it's optimized for speed and efficiency)",
+        type: "textInput",
+        acceptableAnswers: ["GPT-5 mini", "Mini", "GPT-5 Mini", "gpt-5 mini", "mini", "gpt-5-mini", "GPT-5-mini"],
+        explanation: "GPT-5 Mini is the faster, more cost-effective version of GPT-5, specifically optimized for well-defined tasks where speed and efficiency matter most. It has the lowest token cost in the GPT-5 family. AI models are priced based on tokens—the pieces of words that models process. For reference, 1,000 tokens ≈ 750 words. GPT-5 Mini delivers excellent performance for focused use cases like customer support, content moderation, data extraction, and classification tasks, while significantly reducing costs compared to the full GPT-5 model. Always match your model choice to your specific use case requirements to optimize both performance and budget."
+      },
+      {
+        question: "Which statement best reflects the purpose of Applied AI?",
+        options: [
+          "Applied AI is only for Data Scientists and boardroom discussions.",
+          "Applied AI maximizes efficiency during routine operations by automating workflows. It focuses on practical use cases that impact daily work and logical decision-making. It requires the workforce to up-skill and adapt.",
+          "Applied AI is limited to academic research and siloed studies.",
+          "Applied AI is exclusively for technical engineers building models."
+        ],
+        correctAnswer: 1,
+        explanation: "Applied AI is designed to be accessible and practical for everyone in an organization. It focuses on real-world applications that directly impact daily workflows and decision-making processes, and it is ideal for routine operations. While it does require workforce upskilling, it creates new opportunities and roles rather than being limited to specialized groups like data scientists, academics, or engineers."
+      },
+      {
+        question: "What provides the foundation for trustworthy AI systems?",
+        options: [
+          "Advanced algorithms, performance computing and vendor outsourcing",
+          "Engaged and informed leadership ensuring governance with routine oversight, data visibility, transparency, valid data, security protocols and traceable data lineage",
+          "Marketing strategies and user engagement campaigns",
+          "Large volumes of outdated and siloed data"
+        ],
+        correctAnswer: 1,
+        explanation: "Trustworthy AI requires a comprehensive framework: data visibility for insight, transparency for understanding decisions, governance for oversight, connected systems for collaboration, valid data for accuracy, and traceable lineage to track data origins and transformations."
+      },
+      {
+        question: "What is the primary function of a RACI Matrix in AI governance?",
+        options: [
+          "To track project budgets and financial allocations",
+          "To define roles and responsibilities and ensure proper oversight",
+          "To monitor AI model performance metrics",
+          "To document technical specifications and requirements"
+        ],
+        correctAnswer: 1,
+        explanation: "A RACI Matrix (Responsible, Accountable, Consulted, Informed) is a project management tool that clearly defines roles and responsibilities to ensure proper oversight in AI initiatives. It identifies who is Responsible for execution, who is Accountable for decisions, who should be Consulted for input, and who needs to be Informed of outcomes. This clarity is essential for effective AI governance, preventing gaps in accountability and ensuring all stakeholders understand their role in the AI lifecycle."
+      },
+      {
+        question: "Air‑gapping can be practiced for isolating networks with additional security and compliance needs because it… (Select all that apply)",
+        options: [
+          "Prevents external actors from accessing the model or the data it processes (Security & Confidentiality)",
+          "Meets strict regulatory requirements such as DoD, GDPR, or HIPAA (Policy Compliance)",
+          "Guarantees that only vetted, approved datasets are used (Controlled Inputs)",
+          "Keeps operations running even if external networks are compromised (Resilience)",
+          "Provides unlimited real‑time access to external data sources"
+        ],
+        correctAnswer: [0, 1, 2, 3],
+        explanation: "Air-gapping isolates systems from external networks, providing multiple security and compliance benefits: preventing unauthorized access, meeting strict regulatory requirements, ensuring only approved data is used, and maintaining operational resilience. However, it specifically prevents access to external data sources, making option E incorrect."
+      },
+      {
+        question: "What are the main goals of applied artificial intelligence using connected agents?",
+        questionSubtext: "Select all that are true.",
+        options: [
+          "To entirely replace human work and automate all business processes.",
+          "Supporting operational excellence and decision making through an ecosystem of connected agents positioned as collaborative, not siloed.",
+          "Automated Value: Reduces burden of basic security checks, improves accuracy, accelerates review cycles.",
+          "Governance anchor: Automated compliance checks make the system auditable and policy‑aligned.",
+          "Human‑centric: Oversight remains with people, reinforcing accountability."
+        ],
+        correctAnswer: [1, 2, 3, 4],
+        explanation: "Applied AI using connected agents focuses on collaboration, immediate value through efficiency, governance through automated compliance, and human oversight. The goal is never to entirely replace human work, but to augment and enhance human capabilities while maintaining accountability."
+      },
+      {
+        question: "What are the potential consequences for organizations that fail to adopt AI?",
+        questionSubtext: "Select all that apply.",
+        options: [
+          "Loss of funding",
+          "Loss of competitive edge",
+          "Increased innovation and market leadership",
+          "Less resilience and agility, and lesser ability to adapt to change"
+        ],
+        correctAnswer: [0, 1, 3],
+        explanation: "Organizations that fail to adopt AI face multiple risks: loss of funding as investors favor AI-ready companies, loss of competitive edge as competitors leverage AI for efficiency and innovation, and reduced resilience and agility making it harder to adapt to market changes. However, increased innovation and market leadership are benefits of successful AI adoption, not consequences of failure to adopt."
+      }
+    ],
+    resources: [
+      { title: "McKinsey - The State of AI", url: "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" },
+      { title: "NIST AI Risk Management Framework", url: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf" },
+      { title: "IEEE Ethics of AI Standards", url: "https://standards.ieee.org/news/get-program-ai-ethics/" },
+      { title: "AI Governance Frameworks Oxford", url: "https://academic.oup.com/edited-volume/41989" },
+      { title: "Responsible AI Toolkit", url: "https://airc.nist.gov/airmf-resources/playbook/" },
+      { title: "MIT Workforce Intelligence", url: "https://mitsloan.mit.edu/sites/default/files/2025-09/MIT%20Sloan%20-%20Workforce%20Intelligence-digital.pdf" },
+      { title: "NICE-AI-Agent-Handbook.pdf", url: "https://resources.nice.com/wp-content/uploads/2025/02/NICE-The-AI-Agent-Handbook.pdf" }
+    ]
+  },
+  {
+    id: 3,
     title: "Understanding Neural Networks",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -266,7 +346,7 @@ const lessonSections = [
     ]
   },
   {
-    id: 3,
+    id: 4,
     title: "Data Preprocessing Techniques",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -300,7 +380,7 @@ const lessonSections = [
     ]
   },
   {
-    id: 4,
+    id: 5,
     title: "Supervised Learning Methods",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -334,7 +414,7 @@ const lessonSections = [
     ]
   },
   {
-    id: 5,
+    id: 6,
     title: "Unsupervised Learning Concepts",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -368,7 +448,7 @@ const lessonSections = [
     ]
   },
   {
-    id: 6,
+    id: 7,
     title: "Natural Language Processing Basics",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -398,11 +478,11 @@ const lessonSections = [
     resources: [
       { title: "Tokenization & Text Processing", url: "#" },
       { title: "Language Models Explained", url: "#" },
-      { title: "Sentiment Analysis Tutorial", url: "#" }
+      { title: "Sentiment Analysis Lesson time • 15 min Knowledge Check • Untimed: self paced", url: "#" }
     ]
   },
   {
-    id: 7,
+    id: 8,
     title: "Computer Vision Fundamentals",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -436,7 +516,7 @@ const lessonSections = [
     ]
   },
   {
-    id: 8,
+    id: 9,
     title: "Model Training & Optimization",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -469,7 +549,7 @@ const lessonSections = [
     ]
   },
   {
-    id: 9,
+    id: 10,
     title: "AI Ethics & Responsible AI",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -524,7 +604,7 @@ const lessonSections = [
     ]
   },
   {
-    id: 10,
+    id: 11,
     title: "Deploying AI in Production",
     videoUrl: "https://app.heygen.com/embedded-player/6acbfe0867184f0c94a4d93fa8291962",
     knowledgeChecks: [
@@ -560,12 +640,12 @@ const lessonSections = [
 ];
 
 function LessonViewerContent({ lessonTitle, onBack, onVideoWatched, isAgent = false }: LessonViewerProps) {
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: number | number[] }>({});
-  const [videoPlaying, setVideoPlaying] = useState<{ [key: number]: boolean }>({});
+  const [selectedAnswers, setSelectedAnswers] = useState({} as { [key: string]: number | number[] });
+  const [videoPlaying, setVideoPlaying] = useState({});
   const [matchedMethods, setMatchedMethods] = useState<{ [key: string]: { methodId: string; methodText: string } }>({});
   const [showDragDropResults, setShowDragDropResults] = useState<{ [key: string]: boolean }>({});
   const [submittedQuizzes, setSubmittedQuizzes] = useState<{ [key: string]: boolean }>({});
-  const [textInputAnswers, setTextInputAnswers] = useState<{ [key: string]: string }>({});
+  const [textInputAnswers, setTextInputAnswers] = useState({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizScore, setQuizScore] = useState<{ correct: number; total: number } | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -826,80 +906,6 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched, isAgent = fa
               isCorrect
             );
           }
-        } else if (check.type === 'textInput') {
-          const userAnswer = textInputAnswers[key]?.trim().toLowerCase();
-          let isCorrect = false;
-          
-          if (userAnswer && check.acceptableAnswers) {
-            // Check if answer contains "mini" - any answer with mini is correct for question 1
-            const containsMini = userAnswer.includes('mini');
-            
-            if (containsMini) {
-              totalPoints += pointsPerQuestion; // Add 12.5 points
-              isCorrect = true;
-            }
-          }
-          
-          // Track quiz answer for ML
-          trackQuizAnswer(
-            lessonTitle,
-            lessonTitle,
-            key,
-            check.question,
-            userAnswer || 'No answer',
-            check.acceptableAnswers?.[0] || '',
-            isCorrect
-          );
-        } else if (check.type === 'dragDrop') {
-          // Question 4: Spot the Blind Spots - 3 points per correct match or 12.5 when all correct
-          let correctMatches = 0;
-          const totalMatches = check.targets?.length || 0;
-          
-          check.targets?.forEach(target => {
-            const matched = matchedMethods[target.id];
-            if (matched && matched.methodId === target.correctMethodId) {
-              correctMatches++;
-            }
-          });
-          
-          const isAllCorrect = correctMatches === totalMatches && totalMatches > 0;
-          
-          // If all correct, give 12.5 points; otherwise 3 points per correct match
-          if (isAllCorrect) {
-            totalPoints += pointsPerQuestion; // 12.5 points for all correct
-          } else {
-            totalPoints += correctMatches * 3; // 3 points per correct match
-          }
-          
-          // Track quiz answer for ML
-          trackQuizAnswer(
-            lessonTitle,
-            lessonTitle,
-            key,
-            check.question,
-            `${correctMatches}/${totalMatches} correct matches`,
-            'All matches correct',
-            isAllCorrect
-          );
-        } else {
-          // Standard single-choice question (including Question 3)
-          const userAnswer = selectedAnswers[key] as number | undefined;
-          const isCorrect = userAnswer === check.correctAnswer;
-          
-          if (isCorrect) {
-            totalPoints += pointsPerQuestion; // Add 12.5 points for correct answer
-          }
-          
-          // Track quiz answer for ML
-          trackQuizAnswer(
-            lessonTitle,
-            lessonTitle,
-            key,
-            check.question,
-            userAnswer !== undefined && check.options ? check.options[userAnswer] : 'No answer',
-            check.options?.[check.correctAnswer as number] || '',
-            isCorrect
-          );
         }
       });
     });
@@ -963,120 +969,669 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched, isAgent = fa
             <span className="text-xs text-muted-foreground ml-auto">{section.duration}</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">{section.title}</h1>
+          {/* NOTE: Lesson content text should be text-sm (this size) and not smaller */}
           {section.subtitle && (
             <div className="text-sm text-muted-foreground mb-4 capitalize">{section.subtitle}</div>
           )}
 
           {/* Learning Objectives for section 1 */}
-          {section.id === 1 && (
+          {/* {section.id === 1 && ( */}
             <div className="mb-8">
               <h2 className="text-lg font-semibold mb-2">Learning Objectives</h2>
               <ul className="list-disc pl-6 text-sm text-muted-foreground space-y-1">
-                <li>Define AI literacy in simple terms.</li>
+                <li>Define AI literacy as it is applied to critical workforce discussions.</li>
                 <li>Identify 2 ways AI capabilities can effect research, learning or career success.</li>
                 <li>Expand AI vocabulary for identifying costs and risks when applying AI.</li>
+                <li>Practice using modern AI capabilites.</li>
               </ul>
             </div>
           )}
 
+          {/* Lesson 1 Header */}
+          {/* {section.id === 1 && ( */}
+            <div className="mb-8">
+              <h2 className="text-xl font-bold">Lesson 1</h2>
+            </div>
+          )}
+
           {/* Real World Activity for section 1 */}
-          {section.id === 1 && (
+          {/* {section.id === 1 && ( */}
             <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* What is AI? Video Card */}
               <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center">
-                <h3 className="font-semibold mb-1">What is AI? - For People in a Hurry.</h3>
-                <p className="text-xs text-muted-foreground mb-2 text-center">Learn how the RACI Matrix clarifies roles and responsibilities in real-world projects.</p>
-                <iframe
-                  width="100%"
-                  height="215"
-                  src={`https://www.youtube.com/embed/2ePf9rue1Ao?enablejsapi=1${isAgent ? '&autoplay=1' : ''}`}
-                  title="What is AI? - For People in a Hurry."
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="rounded-lg mb-2"
-                  onLoad={() => markActivityInteraction('youtube-watched')}
-                ></iframe>
+                <h3 className="font-semibold mb-1">Applied AI for people in a Hurry.</h3>
               </div>
-              {/* AI Literacy Card (inline, half width) */}
-              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center">
-                <h3 className="font-semibold mb-1">What is AI Literacy?</h3>
-                <p className="text-xs text-muted-foreground mb-2 text-center">
-                  <b>Definition:</b> The ability to understand, use, and evaluate AI tools responsibly.
-                </p>
-                <p className="text-xs text-muted-foreground mb-2 text-center">
-                  <b>Analogy:</b> Just like computer literacy became essential in the 1990s, AI literacy is today's baseline skill.
-                </p>
-                {/* Callout 1 */}
-                <div className="text-xs italic bg-gray-100 text-purple-700 mb-2 text-left border-l-4 border-purple-600 pl-2 px-1 dark:bg-gray-200 dark:text-black">
-                  "Career success increasingly depends on the ability to collaborate with AI systems, not just traditional skills"<br/>
-                  <span className="text-[10px]">- Forbes</span>
+              {/* AI Literacy Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">AI Literacy</h3>
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <p>
+                    AI literacy is the ability to understand, use, and evaluate AI tools responsibly while leveraging them to enhance innovation, creativity, and productivity across personal, educational, and professional contexts.
+                  </p>
+                  
+                  <blockquote className="border-l-4 border-primary pl-4 italic">
+                    "Career success increasingly depends on the ability to collaborate with AI systems, not just traditional skills"
+                  </blockquote>
+                  <p className="text-xs text-muted-foreground">- Forbes</p>
+                  
+                  <blockquote className="border-l-4 border-primary pl-4 italic">
+                    "WEF predicts 170 million new roles will be created by AI over the next decade, making AI literacy essential for workforce readiness"
+                  </blockquote>
+                  <p className="text-xs text-muted-foreground">- World Economic Forum (WEF) Findings</p>
                 </div>
-                {/* Callout 2 */}
-                <div className="text-xs italic bg-gray-100 text-purple-700 mb-2 text-left border-l-4 border-purple-600 pl-2 px-1 dark:bg-gray-200 dark:text-black">
-                  "WEF predicts 170 million new roles will be created by AI over the next decade, making AI literacy essential for workforce readiness"<br/>
-                  <span className="text-[10px]">- World Economic Forum (WEF) Findings</span>
+                
+                <div className="mt-4">
+                  <h4 className="font-semibold text-sm mb-2">Bias and Risk in AI</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Bias and risk in AI are not just technical problems. They are human-centered, social, ethical, and political challenges. AI literacy is the new baseline for responsible AI governance. Without it, discussions about bias, risk and return on AI investments collapse. With it, they become actionable, and trustworthy.
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground mb-2 text-center">
-                  <b>AI Bias:</b> Algorithms may weigh certain features (like word choice, school, or zip code) that highly correlate with race, gender, or socioeconomic status.
-                </p>
               </div>
-              {/* Micro-Mini Lesson about OpenAI Card */}
-              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center">
-                <h3 className="font-semibold mb-1">Micro-Lesson: Understanding OpenAI Costs</h3>
-                <ul className="text-xs text-muted-foreground mb-2 text-left list-disc pl-4 w-full max-w-xs">
-                  <li><b>AI breaks down text or speech into structured data.</b></li>
-                  <li><b>Vertexes & Numbers:</b> Think of it like mapping words into points in a giant network, each linked by numerical weights.</li>
-                  <li><b>Tokens:</b> Words, phrases, or chunks of text are converted into tokens (the basic units AI processes).</li>
-                  <li><b>Cost:</b> Every token processed has a cost. More tokens = higher expense.</li>
-                  <li><b>Free Trial Credits:</b> OpenAI's API offers free credits (e.g., $5 worth) for a trial period. These let you experiment without paying.</li>
-                  <li><b>Copilot Chat (Microsoft context):</b> If you're using Copilot inside Microsoft 365 (like Word, Excel, SharePoint), you don't see tokens directly — licensing covers usage.</li>
-                  <li><b>Limits:</b> Once you use up the free credits, you must pay per token. There is a "Pay-As-You-Go" structure. There's no unlimited free usage.</li>
-                </ul>
-                <a href="https://openai.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs mb-1">Visit OpenAI - ask questions to build AI vocabulary!</a>
-              </div>
-              {/* PixSpy YouTube Lesson Card */}
-              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center">
-                <h3 className="font-semibold mb-1">PixSpy.com: AI Image Analysis Demo</h3>
-                <p className="text-xs text-muted-foreground mb-2 text-center">
-                  <b>Watch PixSpy.com</b><br />
-                  Watch a few minutes of the video and explore <a href="https://pixspy.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline">PixSpy.com</a>.<br />
-                  Upload an image of your choice or a screen shot. This learning experience is yours to shape—what you discover and create with these tools is limited only by your imagination!
-                </p>
-                <iframe
-                  width="100%"
-                  height="215"
-                  src="https://www.youtube.com/embed/P5mVYUuYtHE?si=G3wB1damBgdERnx2"
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                  className="rounded-lg mb-2 w-full aspect-video max-w-full"
-                  onLoad={() => markActivityInteraction('pixspy-clicked')}
-                ></iframe>
-              </div>
+              
               {/* NotebookLM Card */}
-              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-center mt-4">
-                <h3 className="font-semibold mb-1">NotebookLM: AI-Powered Research</h3>
-                <a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer" className="w-full">
-                  <img src="/NotebookLM.png" alt="NotebookLM" className="w-full h-32 object-contain mb-2" />
-                </a>
-                <span className="text-xs text-muted-foreground mb-1 w-full text-left">"LM" stands for Language Model.</span>
-                <p className="text-xs text-muted-foreground mb-2 text-left w-full">
-                  NotebookLM is Google's AI‑powered research and note‑taking tool. It serves as a thinking partner to support research and learning. Start your own notebook today—for Applied AI. Copy this text paragraph and click to Try NotebookLM. Paste the text and generate a mindmpat or presentation.
-                </p>
-                <a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs mb-1 w-full text-left">Try NotebookLM</a>
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">NotebookLM</h3>
+                <div className="text-sm text-muted-foreground space-y-3 w-full">
+                  <p>
+                    NotebookLM is Google's AI-powered research assistant that helps you understand complex documents and research papers through conversational AI. It transforms static documents into interactive conversations, making research more efficient and insightful.
+                  </p>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">Key Features</h4>
+                    <ul className="space-y-1 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Document Analysis:</strong> Upload PDFs, research papers, or documents to get AI-powered summaries and insights.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Conversational Research:</strong> Ask questions about your documents and get contextual answers with citations.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Source Grounding:</strong> Every response includes references to the specific parts of your documents.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Research Synthesis:</strong> Connect ideas across multiple documents to uncover new insights.</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="mt-4 w-full">
+                    <div className="aspect-video w-full">
+                      <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src="https://www.youtube.com/embed/6dHmu1GALmA?si=jnANEBjQ341QMInH" 
+                        title="YouTube video player" 
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerPolicy="strict-origin-when-cross-origin" 
+                        allowFullScreen
+                        className="rounded-lg"
+                      ></iframe>
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-primary underline">
+                    <a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer">Try NotebookLM - Transform your research workflow!</a>
+                  </p>
+                </div>
               </div>
-              {/* Frameworks Card */}
-              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start mt-4">
-                <h3 className="font-semibold mb-1">Frameworks</h3>
-                <p className="text-xs text-muted-foreground mb-2">
-                  Frameworks provide proven guardrails for success. The OpenAI framework provides powerful capabilities for shared use and experimentation, there are several open source tools available including Pixspy.com and NotebookLM. These tools are designed for collaborative exploration, innovation and hands-on learning, allowing you to experiment with AI concepts in practical scenarios.
-                </p>
+              
+              {/* Micro-Lesson Open AI Costs Card */}
+              {section.id === 1 && (
+                <div className="mb-8">
+                  <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                    <h3 className="font-semibold mb-2">Micro-Lesson Open AI Costs</h3>
+                    <div className="text-sm text-muted-foreground space-y-3">
+                      <ul className="space-y-1 ml-4">
+                        <li className="flex items-start gap-2">
+                          <span className="text-muted-foreground">•</span>
+                          <span>AI breaks down text or speech into structured data.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-muted-foreground">•</span>
+                          <span>Vertexes & Numbers: Think of it like mapping words into points in a giant network, each linked by numerical weights.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-muted-foreground">•</span>
+                          <span>Tokens: Words, phrases, or chunks of text are converted into tokens (the basic units AI processes).</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-muted-foreground">•</span>
+                          <span>Cost: Every token processed has a cost. More tokens = higher expense.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-muted-foreground">•</span>
+                          <span>Free Trial Credits: OpenAI's API offers free credits (e.g., $5 worth) for a trial period. These let you experiment without paying.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-muted-foreground">•</span>
+                          <span>Copilot Chat (Microsoft context): If you're using Copilot inside Microsoft 365 (like Word, Excel, SharePoint), you don't see tokens directly — licensing covers usage.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-muted-foreground">•</span>
+                          <span>Limits: Once you use up the free credits, you must pay per token. There is a "Pay-As-You-Go" structure. There's no unlimited free usage.</span>
+                        </li>
+                      </ul>
+                      <p className="text-sm text-primary underline">
+                        <a href="https://openai.com/" target="_blank" rel="noopener noreferrer">Visit OpenAI - ask questions to build AI vocabulary!</a>
+                      </p>
+                      
+                      <div className="mt-6 p-4 border rounded-lg bg-purple-50 dark:bg-gradient-to-br dark:from-purple-400 dark:via-purple-700 dark:to-blue-900">
+                        <div className="font-medium mb-2 text-black">Cost Considerations: Identify the faster, cheaper version of GPT-5 designed for well-defined tasks with the lowest token cost.</div>
+                        <div className="text-xs text-muted-foreground mb-2">Reference</div>
+                        <input
+                          type="text"
+                          placeholder="Enter the model name (hint: it's optimized for speed and efficiency)"
+                          className="border rounded px-2 py-1 w-full text-sm mb-2"
+                          value={textInputAnswers['cost-consideration'] || ''}
+                          onChange={e => handleTextInputAnswer(1, 999, e.target.value)} // Using section 1 and arbitrary checkIndex
+                          disabled={submittedQuizzes['cost-consideration']}
+                        />
+                        {(textInputAnswers['cost-consideration'] || '').toLowerCase().includes('mini') && !submittedQuizzes['cost-consideration'] && (
+                          <div className="text-xs mt-1 text-green-600">Correct!</div>
+                        )}
+                        {submittedQuizzes['cost-consideration'] && (
+                          <div className={`text-xs mt-1 ${isTextInputAnswerCorrect(1, 999, ['gpt-4o mini', 'GPT-4o mini', 'gpt-4o-mini', 'GPT-4o-mini']) ? 'text-green-600' : 'text-red-500'}`}>
+                            {isTextInputAnswerCorrect(1, 999, ['gpt-4o mini', 'GPT-4o mini', 'gpt-4o-mini', 'GPT-4o-mini']) ? 'Correct!' : 'Incorrect.'}
+                          </div>
+                        )}
+                        <Button size="sm" className="mt-2 bg-green-500 hover:bg-green-600 text-white" onClick={() => handleSubmitQuiz(1, 999)} disabled={submittedQuizzes['cost-consideration']}>Submit</Button>
+                        {submittedQuizzes['cost-consideration'] && (
+                          <div className="text-xs text-muted-foreground mt-2">The GPT-4o mini model is optimized for speed and cost-efficiency while maintaining strong performance on well-defined tasks.</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* PixSpy Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">Image Analysis with PixSpy</h3>
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <p>
+                    When people think of AI, they often picture chatbots or language models — but not all AI is text‑based. Some of the most powerful applications live in the world of vision. PixSpy.com is a free online image inspection multi‑tool that lets you upload or paste images and analyze them at the pixel level. Designed for tasks like measuring, zooming, cropping, and extracting color information, it's a go‑to resource for designers, developers, and anyone who needs precise image analysis.
+                  </p>
+                  
+                  <div className="mt-4 w-full">
+                    <div className="aspect-video w-full">
+                      <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src="https://www.youtube.com/embed/P5mVYUuYtHE" 
+                        title="Make Your Own AI Tank Detecting Model" 
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerPolicy="strict-origin-when-cross-origin" 
+                        allowFullScreen
+                        className="rounded-lg"
+                      ></iframe>
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-primary underline">
+                    <a href="https://pixspy.com/" target="_blank" rel="noopener noreferrer">Try PixSpy Now! This learning experience is yours to explore and make what you want. https://pixspy.com</a>
+                  </p>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">What people want to know about PixSpy</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-medium text-sm">Do I need a subscription or an account to try PixSpy?</p>
+                        <p className="text-sm">Nope! Pix Spy is completely free to use and there are no ads. We created the site to scratch our own itch and to help you in your pursuit of the perfect image.</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Are my images safe?</p>
+                        <p className="text-sm">Definitely! All processing is done in JavaScript in your browser so your images never leave your computer.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Part 2 Divider */}
+              <div className="flex items-center justify-center my-12 py-8">
+                <div className="flex-1 border-t border-border"></div>
+                <div className="px-6 text-lg font-semibold text-muted-foreground bg-background">Part 2</div>
+                <div className="flex-1 border-t border-border"></div>
+              </div>
+              
+              {/* Localized & Airgapped AI Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">AI Can Be Localized and Airgapped</h3>
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <p>
+                    AI doesn't always require cloud connectivity or constant internet access. Modern AI solutions can be deployed locally on your own hardware, providing privacy, security, and independence from external services. Airgapped AI systems operate completely offline, ensuring sensitive data never leaves your controlled environment.
+                  </p>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">Benefits of Localized AI</h4>
+                    <ul className="space-y-1 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Data Privacy:</strong> Keep sensitive information secure within your infrastructure.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Cost Control:</strong> Avoid ongoing cloud service fees and data transfer costs.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Reliability:</strong> Operate independently of internet connectivity or service outages.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Compliance:</strong> Meet regulatory requirements for data sovereignty and security.</span>
+                      </li>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">IBM Defense Model</h4>
+                    <p className="text-sm text-muted-foreground">
+                      October 2025 marked the debut of the IBM Defense Model, a purpose-built AI model designed to deliver reliable intelligence for defense and national security. Unlike general-purpose large language models, the IBM Defense Model is optimized for defense-specific tasks and deployable in air-gapped, classified, and edge settings.
+                    </p>
+                  </div>
+                  
+                  <p className="text-sm text-primary underline">
+                    <a href="https://www.ibm.com/new/announcements/ibm-launches-watsonx-data-developer-edition-to-power-your-next-prototype" target="_blank" rel="noopener noreferrer">Explore IBM Watsonx Data Developer Edition - Power your AI prototypes locally!</a>
+                  </p>
+                  
+                  <p className="text-sm text-primary underline">
+                    <a href="https://newsroom.ibm.com/" target="_blank" rel="noopener noreferrer">IBM Announces Defense-Focused AI Model to Accelerate Mission Planning and Decision Support</a>
+                  </p>
+                </div>
+              </div>
+              
+              {/* IBM Watson Healthcare Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">Key Ways Watson Supports Healthcare & Diagnosis</h3>
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <div className="mt-4 w-full">
+                    <div className="aspect-video w-full">
+                      <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src="https://www.youtube.com/embed/fAzHBTIBjss" 
+                        title="How IBM Watson Works" 
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerPolicy="strict-origin-when-cross-origin" 
+                        allowFullScreen
+                        className="rounded-lg"
+                      ></iframe>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <ul className="space-y-2 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Data Analysis at Scale:</strong> Watson can sift through millions of patient records, clinical studies, and treatment guidelines to provide evidence-based recommendations.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Enhanced Diagnostic Accuracy:</strong> By cross-referencing symptoms, lab results, and imaging data, Watson helps clinicians identify possible conditions faster and with greater precision.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Personalized Treatment Plans:</strong> Watson tailors recommendations to individual patient needs, factoring in genetics, lifestyle, and medical history.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Medical Imaging Support:</strong> AI-powered image recognition assists radiologists in detecting anomalies in scans, reducing human error.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Administrative Efficiency:</strong> Beyond diagnosis, Watson automates tasks like claims processing and patient communication, freeing up time for direct care.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           )}
+
+          {/* Part 3 Divider */}
+          <div className="flex items-center justify-center my-12 py-8">
+            <div className="flex-1 border-t border-border"></div>
+            <div className="px-6 text-lg font-semibold text-muted-foreground bg-background">Part 3</div>
+            <div className="flex-1 border-t border-border"></div>
+          </div>
+
+          {/* Frameworks Cards */}
+          {section.id === 1 && (
+            <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Trusted Frameworks Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">Trusted Frameworks</h3>
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <p>
+                    Frameworks like (National Institute of Standards and Technology) NIST's AI Risk Management Framework, Agile, and Scrum provide structured ways to balance innovation with governance. They help organizations harness AI responsibly, adapt quickly to change, and ensure human oversight remains central.
+                  </p>
+                  
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Why Frameworks Matter in AI, Governance, and Innovation</h4>
+                    <ul className="space-y-1 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Consistency and trust:</strong> Frameworks establish common standards so AI systems are reliable, explainable, and accountable.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Governance alignment:</strong> They embed risk management and oversight into innovation, preventing misuse or bias.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Scalable innovation:</strong> Frameworks allow organizations to experiment with AI while maintaining control, ensuring ideas can move from pilot to enterprise scale.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Human-in-the-loop:</strong> They emphasize that automation must coexist with human judgment, especially in sensitive domains.</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Risks and Trade-offs</h4>
+                    <ul className="space-y-1 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Over-automation:</strong> Relying too heavily on AI agents without governance can erode trust.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Cultural resistance:</strong> Teams may struggle to adapt if frameworks are perceived as restrictive.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Complexity:</strong> Combining AI with governance frameworks requires careful integration to avoid slowing innovation.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              {/* AI Frameworks Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">AI Frameworks</h3>
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <div className="mt-1">
+                    <h4 className="font-semibold text-sm mb-2">Lean Six Sigma Framework</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Lean Six Sigma (often shortened to Lean 6) is considered a framework and methodology for process improvement. It combines the principles of Lean management (eliminating waste, improving flow) with Six Sigma (reducing variation, improving quality) to create a structured approach for operational excellence.
+                    </p>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">Agile Framework</h4>
+                    <ul className="space-y-1 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Adaptability:</strong> Emphasizes iterative development, rapid feedback, and flexibility — critical for AI projects where outcomes are uncertain.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Innovation Driver:</strong> AI integrated into Agile workflows accelerates experimentation and learning.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Governance Fit:</strong> Agile's transparency and continuous review cycles align with oversight needs without stifling creativity. 🔗 Agile Alliance</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">Scrum Framework</h4>
+                    <ul className="space-y-1 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Structure:</strong> Provides clear roles and iterative sprints.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>AI Integration:</strong> AI can enhance Scrum by automating backlog prioritization, forecasting sprint outcomes, and providing real‑time analytics.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Governance Balance:</strong> Scrum's emphasis on accountability and transparency complements AI governance, ensuring innovation is guided by clear responsibilities. 🔗 Scrum.org</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Governance Essentials Cards */}
+          {section.id === 1 && (
+            <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Key Performance Indicators Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">Key Performance Indicators (KPIs) for AI Governance</h3>
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <p>
+                    Effective AI governance requires measurable outcomes. Key Performance Indicators (KPIs) help organizations track the success of their AI initiatives and ensure they align with business objectives and ethical standards.
+                  </p>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">Essential AI Governance KPIs</h4>
+                    <ul className="space-y-2 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Model Accuracy & Performance:</strong> Measures how well AI models perform against established benchmarks and real-world outcomes.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Bias Detection Rate:</strong> Tracks the frequency and effectiveness of bias identification in AI systems and datasets.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Compliance Adherence:</strong> Monitors adherence to regulatory requirements and internal governance policies.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Incident Response Time:</strong> Measures how quickly the organization responds to and resolves AI-related incidents or issues.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Stakeholder Satisfaction:</strong> Gauges user and stakeholder confidence in AI systems through surveys and feedback.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>ROI on AI Investments:</strong> Tracks the financial and operational returns from AI implementations.</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">Why KPIs Matter</h4>
+                    <p className="text-sm text-muted-foreground">
+                      KPIs provide quantitative measures of AI governance effectiveness, enabling data-driven decisions and continuous improvement. They help demonstrate accountability to stakeholders and ensure AI initiatives deliver measurable value while maintaining ethical standards.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* RACI Matrix Card */}
+              <div className="border rounded-lg p-4 bg-muted/10 flex flex-col items-start">
+                <h3 className="font-semibold mb-2">RACI Matrix: Roles & Accountability in AI Governance</h3>
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <div className="mt-1">
+                    <h4 className="font-semibold text-sm mb-2">What is RACI?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      RACI is a project management framework that clarifies roles and responsibilities. It stands for:
+                    </p>
+                    <ul className="space-y-1 ml-4 mt-2">
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-600 font-semibold">R</span>
+                        <span><strong>Responsible:</strong> The person who does the work and is accountable for task completion.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 font-semibold">A</span>
+                        <span><strong>Accountable:</strong> The person ultimately answerable for the correct and thorough completion of the task.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-orange-600 font-semibold">C</span>
+                        <span><strong>Consulted:</strong> People whose opinions are sought and who provide input before the task is completed.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-purple-600 font-semibold">I</span>
+                        <span><strong>Informed:</strong> People who need to be kept up-to-date on progress and outcomes.</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">RACI in AI Governance</h4>
+                    <ul className="space-y-2 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Prevents Confusion:</strong> Clearly defines who is responsible for each aspect of AI governance, eliminating ambiguity.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Ensures Accountability:</strong> Establishes clear lines of accountability for AI decisions and outcomes.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Improves Communication:</strong> Facilitates better information flow between stakeholders at different levels.</span>
+                                           </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-muted-foreground">•</span>
+                        <span><strong>Risk Mitigation:</strong> Helps identify gaps in oversight and ensures all critical governance activities are assigned.</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-sm mb-2">AI Governance RACI Example</h4>
+                    <div className="bg-muted/20 p-3 rounded text-xs">
+                      <div className="grid grid-cols-5 gap-2 font-medium mb-2">
+                        <div>Activity</div>
+                        <div className="text-center">Data Scientist</div>
+                        <div className="text-center">AI Ethics Lead</div>
+                        <div className="text-center">Legal Team</div>
+                        <div className="text-center">Executive</div>
+                      </div>
+                      <div className="grid grid-cols-5 gap-2 text-xs">
+                        <div>Bias Assessment</div>
+                        <div className="text-center text-green-600 font-semibold">R</div>
+                        <div className="text-center text-blue-600 font-semibold">A</div>
+                        <div className="text-center text-orange-600 font-semibold">C</div>
+                        <div className="text-center text-purple-600 font-semibold">I</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Spot the Blind Spots Card */}
+          <div className="mb-6 border rounded-lg p-4 bg-muted/10">
+            <h3 className="font-semibold mb-2">Spot the Blind Spots</h3>
+            <div className="text-xs text-muted-foreground mb-4">Drag the correct answer to match each possible blind spot below.</div>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 flex flex-col gap-2">
+                {[
+                  { id: "vendorDependency", text: "Vendor Dependency" },
+                  { id: "biasAwareness", text: "Bias Awareness" },
+                  { id: "oversightCapacity", text: "Oversight Capacity" },
+                  { id: "technicalLiteracy", text: "Technical Literacy" }
+                ].map((item, idx) => (
+                  <DraggableMethod
+                    key={item.id}
+                    id={item.id}
+                    text={item.text}
+                    isMatched={Object.values(matchedMethods).some((m: any) => m.methodId === item.id)}
+                  />
+                ))}
+              </div>
+              <div className="flex-1 flex flex-col gap-2">
+                {[
+                  { id: "t1", description: "Single reviewer", correctMethodId: "oversightCapacity" },
+                  { id: "t2", description: "Lack of skills and AI literacy to evaluate outputs", correctMethodId: "technicalLiteracy" },
+                  { id: "t3", description: "Failure to audit and test for diverse groups", correctMethodId: "biasAwareness" },
+                  { id: "t4", description: "Lock‑in and reduced adaptability", correctMethodId: "vendorDependency" }
+                ].map(target => (
+                  <DropTarget
+                    key={target.id}
+                    id={target.id}
+                    description={target.description}
+                    matchedMethodText={matchedMethods[target.id]?.methodText || null}
+                    matchedMethodId={matchedMethods[target.id]?.methodId || null}
+                    correctMethodId={target.correctMethodId}
+                    onDrop={handleMethodDrop}
+                    showResults={!!showDragDropResults['blind-spots']}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <Button size="sm" variant="outline" onClick={() => resetDragDropQuestion(1, 999)}>Reset</Button>
+              <Button size="sm" onClick={() => checkDragDropAnswers(1, 999)} disabled={showDragDropResults['blind-spots']}>Check Answers</Button>
+            </div>
+            {showDragDropResults['blind-spots'] && (
+              <div className="text-xs text-muted-foreground mt-2">Organizational blind spots in AI governance can undermine trust and effectiveness. Single reviewers create oversight capacity issues, lack of AI literacy hinders technical evaluation, failure to test for bias affects fairness, and vendor dependency reduces adaptability. Identifying these gaps early ensures comprehensive governance.</div>
+            )}
+          </div>
+
+          {/* Resources Card */}
+          <div className="mb-6 border rounded-lg p-4 bg-muted/10">
+            <h3 className="font-semibold mb-4">Resources & Completion Checklist</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Resources Section */}
+              <div>
+                <h4 className="font-medium mb-2 text-sm">Learning Resources</h4>
+                <ul className="space-y-1 ml-4 text-sm text-muted-foreground">
+                  <li>• McKinsey - The State of AI</li>
+                  <li>• NIST AI Risk Management Framework</li>
+                  <li>• IEEE Ethics of AI Standards</li>
+                  <li>• AI Governance Frameworks Oxford</li>
+                  <li>• Responsible AI Toolkit</li>
+                  <li>• MIT Workforce Intelligence</li>
+                  <li>• NICE-AI-Agent-Handbook.pdf</li>
+                </ul>
+              </div>
+              
+              {/* Divider */}
+              <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border transform -translate-x-1/2"></div>
+              
+              {/* Completion Checklist Section */}
+              <div>
+                <h4 className="font-medium mb-2 text-sm">Activity Completion</h4>
+                <div className="space-y-2">
+                  {[
+                    { key: 'video-clicked', label: 'Watch Introduction Video' },
+                    { key: 'video-sentiment-completed', label: 'Complete Video Sentiment Check' },
+                    { key: 'microlesson-clicked', label: 'Explore Micro-Lesson' },
+                    { key: 'pixspy-clicked', label: 'Try PixSpy Image Analysis' },
+                    { key: 'notebook-clicked', label: 'Explore NotebookLM' },
+                    { key: 'pdf-clicked', label: 'Download PDF Resources' },
+                    { key: 'handbook-clicked', label: 'Access AI Handbook' }
+                  ].map((activity) => (
+                    <div key={activity.key} className="flex items-center gap-2 text-sm">
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center text-xs ${
+                        activityInteractions[activity.key] 
+                          ? 'bg-green-500 text-white' 
+                          : 'bg-muted border border-muted-foreground/30'
+                      }`}>
+                        {activityInteractions[activity.key] && '✓'}
+                      </div>
+                      <span className={activityInteractions[activity.key] ? 'text-green-700 dark:text-green-400' : 'text-muted-foreground'}>
+                        {activity.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Knowledge Checks */}
           <div className="mb-10">
@@ -1119,8 +1674,23 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched, isAgent = fa
                     {check.questionSubtext && <div className="text-xs text-muted-foreground mb-2">{check.questionSubtext}</div>}
                     <div className="flex flex-col md:flex-row gap-4">
                       <div className="flex-1 flex flex-col gap-2">
+                        {check.methods && check.methods.map((method, idx) => {
+                          // Check if this method is already matched
+                          const isMatched = Object.values(matchedMethods).some((m: any) => m.methodId === method.id);
+                          return (
+                            <DraggableMethod
+                              key={method.id}
+                              id={method.id}
+                              text={method.text}
+                              isMatched={isMatched}
+                            />
+                          );
+                        })}
+                      </div>
+                      <div className="flex-1 flex flex-col gap-2">
                         {check.targets && check.targets.map((target, idx) => (
                           <DropTarget
+                            key={target.id}
                             id={target.id}
                             description={target.description}
                             matchedMethodText={matchedMethods[target.id]?.methodText || null}
@@ -1130,15 +1700,6 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched, isAgent = fa
                             showResults={!!showDragDropResults[key]}
                           />
                         ))}
-                      </div>
-                      <div className="flex-1 flex flex-col gap-2">
-                        {check.methods && check.methods.map((method, idx) => {
-                          // Check if this method is already matched
-                          const isMatched = Object.values(matchedMethods).some((m: any) => m.methodId === method.id);
-                          return (
-                            <DraggableMethod id={method.id} text={method.text} isMatched={isMatched} />
-                          );
-                        })}
                       </div>
                     </div>
                     <div className="flex gap-2 mt-4">

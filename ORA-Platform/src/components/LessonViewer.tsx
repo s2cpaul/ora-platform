@@ -559,23 +559,23 @@ const lessonSections = [
 ];
 
 function LessonViewerContent({ lessonTitle, onBack, onVideoWatched }: LessonViewerProps) {
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: number | number[] }>({});
-  const [videoPlaying, setVideoPlaying] = useState<{ [key: number]: boolean }>({});
-  const [matchedMethods, setMatchedMethods] = useState<{ [key: string]: { methodId: string; methodText: string } }>({});
-  const [showDragDropResults, setShowDragDropResults] = useState<{ [key: string]: boolean }>({});
-  const [submittedQuizzes, setSubmittedQuizzes] = useState<{ [key: string]: boolean }>({});
-  const [textInputAnswers, setTextInputAnswers] = useState<{ [key: string]: string }>({});
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [videoPlaying, setVideoPlaying] = useState({});
+  const [matchedMethods, setMatchedMethods] = useState({} as { [key: string]: { methodId: string; methodText: string } });
+  const [showDragDropResults, setShowDragDropResults] = useState({});
+  const [submittedQuizzes, setSubmittedQuizzes] = useState({});
+  const [textInputAnswers, setTextInputAnswers] = useState({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [quizScore, setQuizScore] = useState<{ correct: number; total: number } | null>(null);
+  const [quizScore, setQuizScore] = useState(null as { correct: number; total: number } | null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null);
+  const [earnedBadge, setEarnedBadge] = useState(null as Badge | null);
   const [pointsEarned, setPointsEarned] = useState(0);
   const [lessonAlreadyCompleted, setLessonAlreadyCompleted] = useState(false);
-  const [speakingQuestion, setSpeakingQuestion] = useState<string | null>(null);
-  const [activityInteractions, setActivityInteractions] = useState<{ [key: string]: boolean }>({});
-  const [viewTrackers, setViewTrackers] = useState<{ [key: string]: ContentViewTracker }>({});
+  const [speakingQuestion, setSpeakingQuestion] = useState(null);
+  const [activityInteractions, setActivityInteractions] = useState({} as { [key: string]: boolean });
+  const [viewTrackers, setViewTrackers] = useState({} as { [key: string]: ContentViewTracker });
   const [showIncompleteAlert, setShowIncompleteAlert] = useState(false);
-  const [pulsatingCards, setPulsatingCards] = useState<string[]>([]);
+  const [pulsatingCards, setPulsatingCards] = useState([]);
 
   // Check if lesson is already completed on mount
   useEffect(() => {
@@ -1622,12 +1622,13 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched }: LessonView
                                             (m: any) => m.methodId === method.id
                                           );
                                           return (
-                                            <DraggableMethod
-                                              key={method.id}
-                                              id={method.id}
-                                              text={method.text}
-                                              isMatched={isMatched}
-                                            />
+                                            <div key={method.id}>
+                                              <DraggableMethod
+                                                id={method.id}
+                                                text={method.text}
+                                                isMatched={isMatched}
+                                              />
+                                            </div>
                                           );
                                         })}
                                       </div>
@@ -1639,7 +1640,6 @@ function LessonViewerContent({ lessonTitle, onBack, onVideoWatched }: LessonView
                                       <div className="space-y-2">
                                         {check.targets.map((target: any) => (
                                           <DropTarget
-                                            key={target.id}
                                             id={target.id}
                                             description={target.description}
                                             matchedMethodText={matchedMethods[target.id]?.methodText || null}

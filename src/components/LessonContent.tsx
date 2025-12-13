@@ -12,10 +12,11 @@ interface LessonContentProps {
 const lessons = [
   {
     id: 1,
-    title: "Micro-Learning module 1: Applied AI Governance\n& Organizational Blind Spots",
+    title: "Micro-Learning Course 1\nApplied AI Governance & Organizational Blind Spots",
+    subtitle: "3 Lessons x 15 minute each • 45 min total",
     description: "Learn fundamental Applied AI concepts to identify and address organizational blind spots when implementing AI governance frameworks.",
-    duration: "15 min 55 seconds",
-    type: "tutorial",
+    duration: "45 min",
+    type: "course",
     completed: false,
     locked: false
   },
@@ -33,7 +34,7 @@ const lessons = [
     title: "Artificial Intelligence Foundation",
     description: "Step-by-step guide to configuring your workspace for AI projects and spotting opportunities for automation",
     duration: "15 min 55 seconds",
-    type: "tutorial",
+    type: "module",
     completed: false,
     locked: true
   },
@@ -58,12 +59,12 @@ const lessons = [
 ];
 
 export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
-  const [selectedLesson, setSelectedLesson] = useState<number | null>(null);
+  const [selectedLesson, setSelectedLesson] = useState(null);
 
   const getIcon = (type: string) => {
     switch(type) {
       case 'video': return Video;
-      case 'tutorial': return BookOpen;
+      case 'module': return BookOpen;
       case 'reading': return FileText;
       default: return BookOpen;
     }
@@ -102,7 +103,7 @@ export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
           </h1>
           <p className="text-xl text-muted-foreground flex items-center gap-2">
             <Brain className="h-5 w-5" />
-            Complete module 1 and submit feedback to unlock next lesson and more valuable content.
+            Complete module 1 and submit feedback to unlock next lesson!
           </p>
         </div>
       </div>
@@ -134,20 +135,13 @@ export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
                           )}
                         </CardTitle>
                         <div className="flex flex-col gap-1 mt-1">
-                          {lesson.id === 2 || lesson.id === 3 || lesson.id === 4 || lesson.id === 5 ? (
-                            <div className="flex flex-col gap-0.5">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground">
-                                  Lesson time
-                                </span>
-                                <span className="text-xs text-muted-foreground">•</span>
-                                <span className="text-xs text-muted-foreground">
-                                  {lesson.duration}
-                                </span>
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                Knowledge Check • Untimed: self paced
-                              </div>
+                          {lesson.subtitle ? (
+                            <div className="text-xs text-muted-foreground">
+                              {lesson.subtitle}
+                            </div>
+                          ) : lesson.id === 2 || lesson.id === 3 || lesson.id === 4 || lesson.id === 5 ? (
+                            <div className="text-xs text-muted-foreground">
+                              Lesson time • 15 min Knowledge Check • Untimed: self paced
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
@@ -180,7 +174,7 @@ export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
                         <ul className="space-y-2 text-xs text-muted-foreground">
                           <li className="flex items-start gap-2">
                             <span className="text-primary mt-1">•</span>
-                            <span>Define AI literacy in simple terms.</span>
+                            <span>Define AI literacy as it is applied to critical workforce discussions.</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <span className="text-primary mt-1">•</span>
@@ -189,6 +183,10 @@ export function LessonContent({ onBack, onVideoWatched }: LessonContentProps) {
                           <li className="flex items-start gap-2">
                             <span className="text-primary mt-1">•</span>
                             <span>Expand AI vocabulary for identifying costs and risks when applying AI.</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-primary mt-1">•</span>
+                            <span>Practice using modern AI capabilites.</span>
                           </li>
                         </ul>
                       </div>

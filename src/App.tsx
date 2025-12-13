@@ -26,6 +26,7 @@ import { ImpactCard } from "./components/ImpactCard";
 import { ImpactStats } from "./components/ImpactStats";
 import { FiveYearConservative } from "./components/FiveYearConservative";
 import { MLAnalyticsDashboard } from "./components/MLAnalyticsDashboard";
+import { LessonViewer } from "./components/LessonViewer";
 import { initEngagementTracking } from "./utils/mlTracking";
 
 export default function App() {
@@ -39,7 +40,7 @@ export default function App() {
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "dark";
   });
 
-  const [currentPage, setCurrentPage] = useState<"home" | "lessons" | "purchase" | "express-checkout" | "projections" | "90day" | "social" | "veterans" | "b2b" | "progress" | "notebook" | "sentiment" | "library" | "about" | "donate" | "impact" | "5year" | "ml-analytics">("home");
+  const [currentPage, setCurrentPage] = useState<"home" | "lessons" | "purchase" | "express-checkout" | "projections" | "90day" | "social" | "veterans" | "b2b" | "progress" | "notebook" | "sentiment" | "library" | "about" | "donate" | "impact" | "5year" | "ml-analytics" | "pagecopy1">("home");
   const [isAgentOpen, setIsAgentOpen] = useState(false);
   const [isSentimentCheckInOpen, setIsSentimentCheckInOpen] = useState(false);
   const [autoPlayAgentVideo, setAutoPlayAgentVideo] = useState(false);
@@ -217,6 +218,11 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  const navigateToPageCopy1 = () => {
+    setCurrentPage("pagecopy1");
+    window.scrollTo(0, 0);
+  };
+
   const toggleAgent = () => {
     setIsAgentOpen(prev => !prev);
   };
@@ -255,6 +261,9 @@ export default function App() {
         onNavigateToSentiment={navigateToSentiment}
         onNavigateToLibrary={navigateToLibrary}
         onNavigateToAbout={navigateToAbout}
+        onNavigateToDonate={navigateToDonate}
+        onNavigateToPageCopy1={navigateToPageCopy1}
+        currentPage={currentPage}
       />
       
       {currentPage === "home" && (
@@ -268,7 +277,7 @@ export default function App() {
       {currentPage === "lessons" && (
         <main>
           <LessonContent 
-            onBack={navigateToHome} 
+            onBack={navigateToHome}
             onVideoWatched={handleAnyVideoEnded}
           />
         </main>
@@ -285,7 +294,7 @@ export default function App() {
       
       {currentPage === "express-checkout" && (
         <main>
-          <ExpressCheckout onBack={navigateToPurchase} />
+          <ExpressCheckout onBack={navigateToHome} />
         </main>
       )}
       
@@ -297,7 +306,7 @@ export default function App() {
       
       {currentPage === "90day" && (
         <main>
-          <IncomeProjection6Month />
+          <IncomeProjection90Day />
         </main>
       )}
 
@@ -333,19 +342,22 @@ export default function App() {
       
       {currentPage === "sentiment" && (
         <main>
-          <SentimentTracking onBack={navigateToHome} />
+          <SentimentTracking
+            onSave={handleSentimentSave}
+            onClose={() => setIsSentimentCheckInOpen(false)}
+          />
         </main>
       )}
       
       {currentPage === "library" && (
         <main>
-          <Library onBack={navigateToHome} />
+          <Library />
         </main>
       )}
       
       {currentPage === "about" && (
         <main>
-          <About onGetStarted={navigateToLessons} />
+          <About />
         </main>
       )}
       
@@ -359,7 +371,7 @@ export default function App() {
       
       {currentPage === "impact" && (
         <main className="min-h-screen">
-          <ImpactStats />
+          <ImpactCard value={1000000} description="Lives impacted through our programs" />
         </main>
       )}
       
@@ -372,6 +384,16 @@ export default function App() {
       {currentPage === "ml-analytics" && (
         <main className="min-h-screen">
           <MLAnalyticsDashboard onBack={navigateToHome} />
+        </main>
+      )}
+      
+      {currentPage === "pagecopy1" && (
+        <main>
+          <LessonViewer
+            lessonTitle="Applied AI Governance & Organizational Blind Spots"
+            onBack={navigateToHome}
+            onVideoWatched={handleAnyVideoEnded}
+          />
         </main>
       )}
       

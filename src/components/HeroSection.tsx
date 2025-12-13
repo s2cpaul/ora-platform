@@ -42,12 +42,12 @@ export function HeroSection() {
             {/* Main mission statement */}
             <h2 className="text-base sm:text-xl md:text-3xl lg:text-4xl font-bold mb-1 md:mb-1.5 leading-tight md:leading-normal text-center px-2 md:px-4 [transform:none] md:[transform:scale(0.78)]" style={{ marginTop: '10px' }}>
               <span className="block md:inline">Transforming challenges into</span>
-              <span className="block md:inline"> measurable change.</span>
+              <span className="block md:inline"> measurable change — with confidence!</span>
             </h2>
             
             {/* Description */}
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-tight md:leading-snug mb-1 md:mb-0.5 text-center px-2 md:px-4" style={{ transform: 'scale(0.897)' }}>
-              ORA is a human-centered, mobile-friendly agile leadership framework and micro-learning experience designed to help you achieve your goals while making the world better!
+              ORA is a human-centered, mobile-friendly agile leadership framework and micro-learning experience designed to help you achieve your goals while making the world better — one, rewarding micro-lesson at a time!
             </p>
             
             {/* Applied AI statement */}

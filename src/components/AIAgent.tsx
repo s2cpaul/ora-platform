@@ -1,7 +1,8 @@
-import { X, Send, Bot, Bell, Mic, MicOff } from "lucide-react";
+import { X, Send, Bot, Bell, Mic, MicOff, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import React, { useState, useRef, useEffect } from "react";
+import OpenAI from "openai";
 
 interface AIAgentProps {
   onClose: () => void;
@@ -29,14 +30,24 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
   ]);
   const [email, setEmail] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const videoIframeRef = useRef<HTMLIFrameElement>(null);
   const [hasAutoPlayed, setHasAutoPlayed] = useState(false);
+  // Initialize OpenAI client
+  const openai = new OpenAI({
+    apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+    dangerouslyAllowBrowser: true // Note: In production, API calls should be made from backend
+  });
 
+  // Initialize speech recognition
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
   useEffect(() => {
     scrollToBottom();
@@ -46,7 +57,7 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      
+
       if (SpeechRecognition) {
         recognitionRef.current = new SpeechRecognition();
         recognitionRef.current.continuous = false;
@@ -56,6 +67,9 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
         recognitionRef.current.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
           setMessage(transcript);
+        };
+
+        recognitionRef.current.onend = () => {
           setIsListening(false);
         };
 
@@ -63,18 +77,8 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
           console.error('Speech recognition error:', event.error);
           setIsListening(false);
         };
-
-        recognitionRef.current.onend = () => {
-          setIsListening(false);
-        };
       }
     }
-
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
   }, []);
 
   // Autoplay video if requested
@@ -91,43 +95,163 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       // HeyGen sends { event: 'ended' } when video finishes
-      if (event.data && event.data.event === 'ended') {
+      if (event.data.event === 'ended') {
         if (onVideoEnded) onVideoEnded();
       }
     }
+
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, [onVideoEnded]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() || isLoading) return;
 
-    // Add user message
+    const userMessageText = message.trim();
+    setMessage("");
+    setError(null);
+    setIsLoading(true);
+
+    // Add user message immediately
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: message,
+      text: userMessageText,
       sender: "user",
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMessage]);
 
-    // Simulate agent response with fallback
-    setTimeout(() => {
-      const agentMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "Hmm... That's an excellent question! Let me do some research and get back to you. You can sign up for notifications before you go. When I have expanded my knowledge, you'll be notified.",
-        sender: "agent",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, agentMessage]);
-    }, 1000);
+    try {
+      console.log("Initializing OpenAI API call...");
 
-    setMessage("");
+      // Check if environment variables are available
+      if (!import.meta.env.VITE_OPENAI_API_KEY) {
+        throw new Error("OpenAI API key not found. Please check your environment configuration.");
+      }
+      if (!import.meta.env.VITE_OPENAI_ASSISTANT_ID) {
+        throw new Error("OpenAI Assistant ID not found. Please check your environment configuration.");
+      }
+
+      console.log("Environment variables validated");
+
+      // Validate assistant exists (optional check)
+      try {
+        console.log("Validating assistant...");
+        await openai.beta.assistants.retrieve(import.meta.env.VITE_OPENAI_ASSISTANT_ID);
+        console.log("Assistant validated successfully");
+      } catch (assistantErr) {
+        console.error("Assistant validation failed");
+        throw new Error("Assistant not found or not accessible. Please check your Assistant ID.");
+      }
+
+      // Create a thread for the conversation
+      console.log("Creating thread...");
+      const thread = await openai.beta.threads.create();
+      console.log("Thread created:", thread.id);
+
+      // Add the user message to the thread
+      console.log("Adding message to thread...");
+      await openai.beta.threads.messages.create(thread.id, {
+        role: "user",
+        content: userMessageText,
+      });
+      console.log("Message added to thread");
+
+      // Run the assistant
+      console.log("Running assistant...");
+      const run = await openai.beta.threads.runs.create(thread.id, {
+        assistant_id: import.meta.env.VITE_OPENAI_ASSISTANT_ID,
+      });
+      console.log("Run created:", run.id);
+
+      // Poll for completion
+      console.log("Polling for completion...");
+      let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+      let attempts = 0;
+      const maxAttempts = 15; // 15 seconds max
+
+      while (runStatus.status !== "completed" && attempts < maxAttempts) {
+        console.log(`Run status: ${runStatus.status} (attempt ${attempts + 1}/${maxAttempts})`);
+        if (runStatus.status === "failed") {
+          throw new Error(`Assistant run failed: ${runStatus.last_error?.message || 'Unknown error'}`);
+        }
+        if (runStatus.status === "cancelled") {
+          throw new Error("Assistant run was cancelled");
+        }
+        if (runStatus.status === "expired") {
+          throw new Error("Assistant run expired");
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+        attempts++;
+      }
+
+      if (attempts >= maxAttempts) {
+        throw new Error("Assistant took too long to respond");
+      }
+
+      if (runStatus.status !== "completed") {
+        throw new Error(`Assistant run ended with status: ${runStatus.status}`);
+      }
+
+      console.log("Run completed, getting messages...");
+      // Get the assistant's response
+      const messages = await openai.beta.threads.messages.list(thread.id);
+      console.log(`Messages retrieved: ${messages.data.length} messages`);
+
+      if (messages.data.length === 0) {
+        throw new Error("No response received from assistant");
+      }
+
+      const assistantMessage = messages.data[0]; // Most recent message
+      console.log("Assistant message type:", assistantMessage.content[0]?.type);
+
+      if (!assistantMessage.content || assistantMessage.content.length === 0) {
+        throw new Error("Assistant returned empty content");
+      }
+
+      if (assistantMessage.content[0].type === "text") {
+        const responseText = assistantMessage.content[0].text.value;
+        if (!responseText || responseText.trim().length === 0) {
+          throw new Error("Assistant returned empty text");
+        }
+        
+        const agentMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: responseText,
+          sender: "agent",
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, agentMessage]);
+        console.log("Agent message added to UI");
+      } else {
+        console.log("Assistant returned non-text content:", assistantMessage.content[0].type);
+        throw new Error(`Assistant returned ${assistantMessage.content[0].type} content, which is not supported`);
+      }
+    } catch (err) {
+      console.error("OpenAI API error occurred");
+      const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+      
+      // Don't log the full error object to avoid exposing sensitive information
+      console.error("Error details:", errorMessage);
+      
+      // Check for common error types
+      if (errorMessage.includes("401") || errorMessage.includes("unauthorized")) {
+        setError("Authentication failed. Please check your API configuration.");
+      } else if (errorMessage.includes("404") || errorMessage.includes("not found")) {
+        setError("Assistant not found. Please check your Assistant ID.");
+      } else if (errorMessage.includes("429") || errorMessage.includes("rate limit")) {
+        setError("Rate limit exceeded. Please try again in a moment.");
+      } else {
+        setError("Sorry, I'm having trouble connecting right now. Please try again later.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleNotificationSignup = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleNotificationSignup = () => {
     if (!email.trim()) return;
     
     // Add confirmation message
@@ -169,7 +293,6 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
           >
             <X className="h-5 w-5" strokeWidth={3} />
           </Button>
-
           {/* Video Container */}
           <div className="relative w-full bg-black flex items-center justify-center">
             {/* HeyGen Interactive Avatar */}
@@ -187,6 +310,27 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
 
         {/* Chat Section - Bottom 63.33% - 16px */}
         <div className="h-[calc(63.33%-16px)] flex flex-col">
+          {/* Error Display */}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg mx-4 mt-4">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-red-800">Error</p>
+                  <p className="text-sm text-red-700 mt-1">{error}</p>
+                </div>
+                <Button
+                  onClick={() => setError(null)}
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Chat Messages Area */}
           <div className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-4">
@@ -197,11 +341,7 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
                       <Bot className="h-4 w-4 text-white" />
                     </div>
                   )}
-                  <div className={`rounded-lg p-3 max-w-[80%] ${
-                    msg.sender === "user" 
-                      ? "bg-primary text-primary-foreground" 
-                      : "bg-muted"
-                  }`}>
+                  <div className={`rounded-lg p-3 max-w-[80%] ${msg.sender === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                     <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                     
                     {/* Show notification signup after fallback response */}
@@ -213,7 +353,7 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
                             <strong>Enable Notifications:</strong>
                           </p>
                         </div>
-                        <form onSubmit={handleNotificationSignup} className="space-y-2">
+                        <div className="space-y-2">
                           <input
                             type="email"
                             value={email}
@@ -223,13 +363,13 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
                             required
                           />
                           <Button
-                            type="submit"
+                            onClick={handleNotificationSignup}
                             size="sm"
                             className="w-full h-7 text-xs"
                           >
                             Sign Up for Updates
                           </Button>
-                        </form>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -243,7 +383,6 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
               <div ref={messagesEndRef} />
             </div>
           </div>
-
           {/* Input Area */}
           <div className="p-4 border-t border-border">
             <form onSubmit={handleSubmit} className="flex gap-2">
@@ -274,7 +413,7 @@ export function AIAgent({ onClose, autoPlayVideo = false, onVideoPlayed, onVideo
                 size="icon"
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                <Send className="h-5 w-5" />
+                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
               </Button>
             </form>
           </div>

@@ -54,17 +54,12 @@ export function About({ onGetStarted }: AboutProps) {
             {/* Main mission statement */}
             <h2 className="text-base sm:text-xl md:text-3xl lg:text-4xl font-bold mb-4 leading-tight md:leading-normal text-center px-2 md:px-4">
               <span className="block md:inline">Transforming challenges into</span>
-              <span className="block md:inline"> measurable change.</span>
+              <span className="block md:inline"> measurable change — with confidence!</span>
             </h2>
             
             {/* Description */}
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-tight md:leading-snug mb-4 text-center px-2 md:px-4">
               ORA is a human-centered, mobile-friendly agile leadership framework and micro-learning experience designed to help you achieve your goals while making the world better!
-            </p>
-            
-            {/* Platform Description */}
-            <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-4 text-center px-2 md:px-4">
-              <strong>ORA is designed to support anyone entering the modern workforce who wants to become AI-enabled through fast, free, mobile micro-learning.</strong> We believe that artificial intelligence literacy is no longer optional—it's essential for career success in today's rapidly evolving job market. We support innovation, efficiency and measurable organizational change. We promote unexpected collaboration, positive vibes, and partnerships for accelerating innovation. <strong>Currently supporting lessons in English and Spanish by default.</strong>
             </p>
           </div>
         </div>
@@ -119,6 +114,91 @@ export function About({ onGetStarted }: AboutProps) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Trusted Frameworks */}
+        <Card className="mb-12 border-2 border-indigo-500/40 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <Shield className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              <strong>Trusted Frameworks</strong>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <p className="text-lg leading-relaxed">
+              Frameworks are proven guardrails for success when working within complex systems. They are strategic enablers to ensure that AI innovation is responsible, scalable, and human-centered, balancing speed with oversight.
+            </p>
+            <p className="text-muted-foreground">
+              Frameworks like NIST's AI Risk Management Framework, Agile, and Scrum provide structured ways to balance innovation with governance. They help organizations harness AI responsibly, adapt quickly to change, and ensure human oversight remains central.
+            </p>
+
+            <div className="bg-white dark:bg-gray-900/50 rounded-lg p-6 border-2 border-indigo-500/30">
+              <h4 className="font-bold text-lg mb-4 flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-indigo-600" />
+                Why Frameworks Matter in AI, Governance, and Innovation
+              </h4>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-sm">Consistency and trust:</strong>
+                    <span className="text-sm"> Frameworks establish common standards so AI systems are reliable, explainable, and accountable.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-sm">Governance alignment:</strong>
+                    <span className="text-sm"> They embed risk management and oversight into innovation, preventing misuse or bias.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-sm">Scalable innovation:</strong>
+                    <span className="text-sm"> Frameworks allow organizations to experiment with AI while maintaining control, ensuring ideas can move from pilot to enterprise scale.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-sm">Human-in-the-loop:</strong>
+                    <span className="text-sm"> They emphasize that automation must coexist with human judgment, especially in sensitive domains.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-orange-50 dark:bg-orange-950/20 rounded-lg p-6 border-2 border-orange-500/30">
+              <h4 className="font-bold text-lg mb-4 flex items-center gap-2 text-orange-700 dark:text-orange-300">
+                <Target className="w-5 h-5" />
+                Risks and Trade-offs
+              </h4>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="w-4 h-4 text-orange-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-sm">Over-automation:</strong>
+                    <span className="text-sm"> Relying too heavily on AI agents without governance can erode trust.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="w-4 h-4 text-orange-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-sm">Cultural resistance:</strong>
+                    <span className="text-sm"> Teams may struggle to adapt if frameworks are perceived as restrictive.</span>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowRight className="w-4 h-4 text-orange-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <strong className="text-sm">Complexity:</strong>
+                    <span className="text-sm"> Combining AI with governance frameworks requires careful integration to avoid slowing innovation.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Veteran Commitment */}
         <Card className="mb-12 border-2">

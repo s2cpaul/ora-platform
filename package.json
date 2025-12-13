@@ -56,11 +56,23 @@
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@vitejs/plugin-react-swc": "^3.10.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "vite": "6.3.5"
   },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "firebase": "firebase init hosting:github"
+    "test": "npm run lint",
+    "firebase": "firebase init hosting:github",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write src/**/*.{ts,tsx}",
+    "prepare": "husky",
+    "check-jsx-syntax": "node scripts/check-jsx-syntax.js"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx"
   }
 }

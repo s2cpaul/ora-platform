@@ -42,6 +42,7 @@ Create a file named `.env` in your project root:
 ```env
 # OpenAI API Configuration
 VITE_OPENAI_API_KEY=sk-your-actual-api-key-here
+VITE_OPENAI_ASSISTANT_ID=asst_o0aFSFlequCud3p6f1TxxZMo
 
 # OpenAI Model Settings
 VITE_OPENAI_MODEL=gpt-4-turbo-preview

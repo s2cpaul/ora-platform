@@ -107,3 +107,36 @@ To use Firebase App Hosting and other advanced features, you must enable billing
 - **Billing Account ID**: 0175A6-C0E8AE-A96919
 
 You can manage billing in the Firebase Console under Usage & Billing. Enabling billing unlocks App Hosting and other production features.
+
+## Content Guidelines
+
+**Text Size Minimum for Lesson Content:**
+- The text size used in lesson subtitles and content should be `text-sm` (this size) and not smaller.
+- Example: "Micro-learning modeule • 15 min | Knowledge Check • Untimed: self paced"
+
+## Training a Video-Centric AI Model
+
+Training a video-centric AI model can be a multi-step challenging task, but here is how you could start:
+
+### Data Gathering
+Obtain a substantial collection of videos that reflect your pattern and context. Your video library will serve as the base dataset for teaching the AI.
+
+### Labeling and Annotation
+Videos need to be tagged and categorized so that the AI can begin to understand what they depict. Annotation tools can assist with this process.
+
+### Designing an AI Model
+A convolutional neural network (CNN) would be ideal for pattern recognition in videos. If the context is equally important, a recurrent neural network (RNN) might be needed to understand the sequence of frames as a whole.
+
+### Train the AI Model
+Use your annotated video library to train your model. In this phase, the model learns from the patterns and contexts you've defined.
+
+### Test the AI Model
+After training, you should test your AI model on unseen video data to evaluate its performance and adjust as necessary.
+
+### Deployment of the AI Model
+Once everything worked as envisaged, you can deploy the AI model to start interpreting videos automatically.
+
+### Continual Learning
+Machine Learning models also improve over time. It's crucial that the model keeps learning from new videos, even after it's been deployed.
+
+**Remember that AI training can take a significant amount of time and resources.** It might be necessary to employ cloud-based services for more extensive computations or to use pre-trained models to hasten the learning process. Also, video annotation can be quite complex. Therefore make sure your annotation tools or services can handle it, or consider working with a partner that can help you with this part.
